@@ -1,16 +1,11 @@
 LOCAL_PATH:= $(call my-dir)
-
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-c-files-under, ncurses/tty) 
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/base) 
 LOCAL_SRC_FILES := $(filter-out ncurses/base/sigaction.c, $(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/tinfo) 
-#OCAL_SRC_FILES += $(call all-c-files-under, ncurses) 
-
-#OCAL_SRC_FILES := $(filter-out ncurses/link_test.c, $(LOCAL_SRC_FILES))
-
-
+LOCAL_SRC_FILES := $(filter-out ncurses/tinfo/make_keys.c, $(LOCAL_SRC_FILES))
 
 LOCAL_SRC_FILES += ncurses/trace/lib_trace.c \
 		ncurses/trace/varargs.c \
@@ -24,7 +19,6 @@ LOCAL_SRC_FILES += ncurses/trace/lib_trace.c \
 		ncurses/names.c \
 		ncurses/unctrl.c \
 
-
 LOCAL_SRC_FILES := $(sort $(LOCAL_SRC_FILES))
 		
 LOCAL_CFLAGS := -DHAVE_CONFIG_H -U_XOPEN_SOURCE -D_XOPEN_SOURCE=500 -U_POSIX_C_SOURCE -D_POSIX_C_SOURCE=199506L -DNDEBUG 
@@ -32,11 +26,9 @@ LOCAL_CFLAGS := -DHAVE_CONFIG_H -U_XOPEN_SOURCE -D_XOPEN_SOURCE=500 -U_POSIX_C_S
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
 		$(LOCAL_PATH)/include \
 		$(LOCAL_PATH)/ncurses \
-	#kernel/android-2.6.32/include
 
 LOCAL_MODULE_TAGS := eng
 LOCAL_MODULE := libncurses
 
-#include $(BUILD_SHARED_LIBRARY)
 include $(BUILD_STATIC_LIBRARY)
 
