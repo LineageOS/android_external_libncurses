@@ -1,0 +1,52 @@
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := $(call all-c-files-under, ncurses/tty) 
+LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/base) 
+
+
+ncurses/tty/hardscroll.c \
+	ncurses/tty/hashmap.c \
+	ncurses/tty/lib_mvcur.c \
+	ncurses/tty/lib_tstp.c \
+	ncurses/tty/lib_twait.c \
+	ncurses/tty/lib_vidattr.c \
+	ncurses/tty/tty_update.c \
+
+	ncurses/tty/*.c
+
+	ncurses/base/*.c
+
+
+
+	 \
+	lib/doc.c \
+	lib/cache_mngr.c \
+	lib/addr.c \
+	lib/socket.c \
+	lib/fib_lookup/lookup.c \
+	lib/fib_lookup/request.c \
+	lib/msg.c \
+	lib/object.c \
+	lib/attr.c \
+	lib/utils.c \
+	lib/cache_mngt.c \
+	lib/handlers.c \
+	lib/genl/ctrl.c \
+	lib/genl/mngt.c \
+	lib/genl/family.c \
+	lib/genl/genl.c \
+	lib/route/rtnl.c \
+	lib/route/route_utils.c
+
+#LOCAL_CFLAGS :=
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+	#kernel/android-2.6.32/include
+
+LOCAL_MODULE_TAGS := eng
+LOCAL_MODULE := libnl
+
+include $(BUILD_SHARED_LIBRARY)
+#include $(BUILD_STATIC_LIBRARY)
+
