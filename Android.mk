@@ -44,7 +44,7 @@ TERMINFO_FILES := \
 
 TERMINFO_SOURCE := $(LOCAL_PATH)/lib/terminfo/
 TERMINFO_TARGET := $(TARGET_OUT_ETC)/terminfo
-$(TERMINFO_TARGET):
+$(TERMINFO_TARGET): $(ACP)
 		@echo "copy terminfo to /etc/" 
 		@mkdir -p $@
 		@$(foreach TERMINFO_FILE,$(TERMINFO_FILES), \
