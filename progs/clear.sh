@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/system/bin/mksh
 ##############################################################################
 # Copyright (c) 1998,2006 Free Software Foundation, Inc.                     #
 #                                                                            #
