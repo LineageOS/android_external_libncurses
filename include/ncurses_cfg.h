@@ -46,17 +46,19 @@
 #ifndef NC_CONFIG_H
 #define NC_CONFIG_H
 
-#define SYSTEM_NAME "eabi"
+#define SYSTEM_NAME "arm-eabi"
 #define CC_HAS_PROTOS 1
 #if 0
-void exit (int);
+#include <stdlib.h>
 #endif
 #define HAVE_LONG_FILE_NAMES 1
 #define MIXEDCASE_FILENAMES 1
 #define USE_DATABASE 1
-#define TERMINFO_DIRS "/usr/local/share/terminfo"
-#define TERMINFO "/usr/local/share/terminfo"
-#define PURE_TERMINFO 1
+#define TERMINFO_DIRS "/data/local/terminfo:/system/etc/terminfo"
+#define TERMINFO "/etc/terminfo"
+#define HAVE_BIG_CORE 1
+#define USE_TERMCAP 1
+#define TERMPATH "/data/local/termcap:/etc/termcap:/system/usr/share/misc/termcap"
 #define USE_HOME_TERMINFO 1
 #define USE_ROOT_ENVIRON 1
 #define HAVE_REMOVE 1
@@ -64,6 +66,23 @@ void exit (int);
 #define HAVE_LINK 1
 #define HAVE_SYMLINK 1
 #define USE_LINKS 1
+#define BSD_TPUTS 1
+//#define HAVE_LANGINFO_CODESET 1a
+#ifdef USE_WIDECHAR
+#define USE_WIDEC_SUPPORT 1
+#define HAVE_PUTWC 1
+#define HAVE_BTOWC 1
+#define HAVE_WCTOB 1
+#define HAVE_MBTOWC 1
+#define HAVE_WCTOMB 1
+#define HAVE_MBLEN 1
+#define HAVE_MBRLEN 1
+#define HAVE_MBRTOWC 1
+#define HAVE_WCSRTOMBS 1
+#define HAVE_MBSRTOWCS 1
+#define HAVE_WCSTOMBS 1
+#define HAVE_MBSTOWCS 1
+#endif
 #define HAVE_FSEEKO 1
 #define HAVE_CURSES_VERSION 1
 #define HAVE_HAS_KEY 1
@@ -72,6 +91,7 @@ void exit (int);
 #define HAVE_USE_DEFAULT_COLORS 1
 #define HAVE_WRESIZE 1
 #define NCURSES_EXT_FUNCS 1
+#define NCURSES_EXT_COLORS 1
 #define NCURSES_NO_PADDING 1
 #define STDC_HEADERS 1
 #define HAVE_SYS_TYPES_H 1
@@ -97,9 +117,11 @@ void exit (int);
 #define STDC_HEADERS 1
 #define HAVE_DIRENT_H 1
 #define TIME_WITH_SYS_TIME 1
+#define HAVE_REGEX_H_FUNCS 1
 #define HAVE_FCNTL_H 1
 #define HAVE_GETOPT_H 1
 #define HAVE_LIMITS_H 1
+#define HAVE_LOCALE_H 1
 #define HAVE_POLL_H 1
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_PARAM_H 1
@@ -107,15 +129,16 @@ void exit (int);
 #define HAVE_SYS_SELECT_H 1
 #define HAVE_SYS_TIME_H 1
 #define HAVE_SYS_TIMES_H 1
+#define HAVE_TTYENT_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_WCTYPE_H 1
 #define HAVE_SYS_TIME_SELECT 1
 #define SIG_ATOMIC_T volatile sig_atomic_t
-#define TYPEOF_CHTYPE long
+#define TYPEOF_CHTYPE int
 #define HAVE_GETCWD 1
 #define HAVE_GETEGID 1
 #define HAVE_GETEUID 1
-#define HAVE_ISSETUGID 1
+#define HAVE_GETTTYNAM 1
 #define HAVE_POLL 1
 #define HAVE_REMOVE 1
 #define HAVE_SELECT 1
@@ -123,20 +146,28 @@ void exit (int);
 #define HAVE_SETBUFFER 1
 #define HAVE_SETVBUF 1
 #define HAVE_SIGACTION 1
+#define HAVE_SIGVEC 1
 #define HAVE_STRDUP 1
 #define HAVE_STRSTR 1
 #define HAVE_TCGETPGRP 1
 #define HAVE_TIMES 1
 #define HAVE_VSNPRINTF 1
 #define HAVE_ISASCII 1
+#define HAVE_NANOSLEEP 1
+#define HAVE_TERMIO_H 1
 #define HAVE_TERMIOS_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_TCGETATTR 1
 #define HAVE_VSSCANF 1
 #define RETSIGTYPE void
 #define HAVE_SIZECHANGE 1
+#define HAVE_WORKING_POLL 1
+#define USE_OPENPTY_HEADER <pty.h>
+#define USE_XTERM_PTY 1
 #define HAVE_IOSTREAM 1
 #define HAVE_TYPEINFO 1
+#define IOSTREAM_NAMESPACE 1
+#define ETIP_NEEDS_MATH_H 1
 #define CPP_HAS_STATIC_CAST 1
 #define HAVE_SLK_COLOR 1
 #define HAVE_PANEL_H 1

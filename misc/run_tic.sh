@@ -42,14 +42,14 @@ echo '** Building terminfo database, please wait...'
 #	make install.data
 
 : ${suffix=}
-: ${DESTDIR=}
-: ${prefix=/usr/local}
+: ${DESTDIR=/system}
+: ${prefix=/system}
 : ${exec_prefix=${prefix}}
 : ${bindir=${exec_prefix}/bin}
 : ${top_srcdir=..}
 : ${srcdir=.}
 : ${datadir=${prefix}/share}
-: ${ticdir=/usr/local/share/terminfo}
+: ${ticdir=/etc/terminfo}
 : ${source=${top_srcdir}/misc/terminfo.src}
 : ${LN_S="ln -s"}
 : ${THAT_CC=cc}

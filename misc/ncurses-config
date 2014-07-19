@@ -30,7 +30,7 @@
 #
 # Author: Thomas E. Dickey, 2006
 
-prefix="/usr/local"
+prefix="/system"
 exec_prefix="${prefix}"
 
 bindir="${exec_prefix}/bin"
@@ -38,7 +38,7 @@ libdir="${exec_prefix}/lib"
 datadir="${prefix}/share"
 mandir="${prefix}/man"
 
-THIS="ncurses"
+THIS="ncursesw"
 
 LANG=C;		export LANG
 LANGUAGE=C;	export LANGUAGE
@@ -95,7 +95,7 @@ ENDECHO
 		echo "5.7.20081102"
 		;;
 	--abi-version)
-		echo "5"
+		echo "6"
 		;;
 	--mouse-version)
 		echo "1"
@@ -114,13 +114,13 @@ ENDECHO
 		echo "${mandir}"
 		;;
 	--terminfo)
-		echo "/usr/local/share/terminfo"
+		echo "/etc/terminfo"
 		;;
 	--terminfo-dirs)
-		echo "/usr/local/share/terminfo"
+		echo "/data/local/terminfo:/system/etc/terminfo"
 		;;
 	--termpath)
-		echo ""
+		echo "/data/local/termcap:/etc/termcap:/system/usr/share/misc/termcap"
 		;;
 	# general info
 	--help)
