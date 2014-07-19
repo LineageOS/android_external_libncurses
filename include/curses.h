@@ -127,7 +127,13 @@
  * of the header incompatible.
  */
 #undef	NCURSES_CH_T
-#define NCURSES_CH_T chtype
+#ifdef USE_WIDECHAR
+# undef USE_WIDEC_SUPPORT
+# define USE_WIDEC_SUPPORT 1
+# define NCURSES_CH_T cchar_t
+#else
+# define NCURSES_CH_T chtype
+#endif
 
 #if 0 && defined(_LP64)
 typedef unsigned chtype;
@@ -332,15 +338,19 @@ typedef	chtype	attr_t;		/* ...must be at least as wide as chtype */
 #include <libutf8.h>
 #endif
 
-#if 0
+#ifdef USE_WIDECHAR
 #include <wchar.h>		/* ...to get mbstate_t, etc. */
+#endif
+
+#ifdef __BIONIC__
+#include <libutf8.h>
 #endif
 
 #if 0
 typedef unsigned short wchar_t;
 #endif
 
-#if 0
+#ifdef USE_WIDECHAR
 typedef unsigned int wint_t;
 #endif
 

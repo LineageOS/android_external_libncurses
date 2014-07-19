@@ -243,7 +243,7 @@ color_t;
 
 #define WINDOWLIST struct _win_list
 
-#if USE_WIDEC_SUPPORT
+#ifdef USE_WIDECHAR
 #define _nc_bkgd    _bkgrnd
 #else
 #undef _XOPEN_SOURCE_EXTENDED
@@ -1545,6 +1545,7 @@ extern NCURSES_EXPORT(int) _nc_ungetch (SCREEN *, int);
 /* lib_wacs.c */
 #if USE_WIDEC_SUPPORT
 extern NCURSES_EXPORT(void) _nc_init_wacs(void);
+cchar_t *_nc_wacs;
 #endif
 
 typedef struct {
@@ -1714,6 +1715,10 @@ extern NCURSES_EXPORT(int) _nc_ripoffline (int line, int (*init)(WINDOW *,int));
  */
 #define MSG_NO_MEMORY "Out of memory"
 #define MSG_NO_INPUTS "Premature EOF"
+
+#ifdef USE_WIDECHAR
+#include <ncursesw.h>
+#endif
 
 #ifdef __cplusplus
 }

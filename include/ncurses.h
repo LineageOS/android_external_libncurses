@@ -329,6 +329,9 @@ typedef	chtype	attr_t;		/* ...must be at least as wide as chtype */
 #ifdef mblen			/* libutf8.h defines it w/o undefining first */
 #undef mblen
 #endif
+#ifdef wctomb
+#undef wctomb
+#endif
 #include <libutf8.h>
 #endif
 
@@ -1484,6 +1487,10 @@ extern NCURSES_EXPORT(const char *) _nc_visbuf (const char *);
 #define OPTIMIZE_HASHMAP	0x02	/* diff hashing to detect scrolls */
 #define OPTIMIZE_SCROLL		0x04	/* scroll optimization */
 #define OPTIMIZE_ALL		0xff	/* enable all optimizations (dflt) */
+#endif
+
+#ifdef USE_WIDECHAR
+#include "ncursesw.h"
 #endif
 
 #ifdef __cplusplus
