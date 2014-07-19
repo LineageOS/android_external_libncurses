@@ -1,7 +1,25 @@
 #ifndef _LIBUTF8_H_
 #define _LIBUTF8_H_ 1
 
-/* from widechar/mblen.c */
+#ifdef __BIONIC__
+
+#ifdef MB_LEN_MAX
+#if MB_LEN_MAX == 1
+#undef MB_LEN_MAX
+#define MB_LEN_MAX 8
+#endif
+#endif
+
+#ifdef MB_CUR_MAX
+#if MB_CUR_MAX == 1
+#undef MB_CUR_MAX
+#define MB_CUR_MAX 4
+#endif
+#endif
+
+#endif /* __BIONIC__ */
+
+/* from widechar/utf8_mbfuncs.c */
 int mblen(const char *s, size_t n);
 
 size_t u8_strlen(char *buf);
