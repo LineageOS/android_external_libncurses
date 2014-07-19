@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/system/bin/sh
 ##############################################################################
 # Copyright (c) 1998,2006 Free Software Foundation, Inc.                     #
 #                                                                            #
@@ -55,11 +55,12 @@ fi
 # Check to see if terminfo is present in one of the standard locations.
 terminfo=no
 for p in $TERMINFO \
-	/usr/lib/terminfo \
-	/usr/share/lib/terminfo \
-	/usr/share/terminfo \
-	/usr/local/lib/terminfo \
-	/usr/local/share/terminfo
+	/etc/terminfo \
+	/system/usr/lib/terminfo \
+	/system/usr/share/lib/terminfo \
+	/system/usr/share/terminfo \
+	/system/usr/local/lib/terminfo \
+	/system/usr/local/share/terminfo
 do
 	if test -d $p ; then
 		terminfo=yes
