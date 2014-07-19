@@ -127,7 +127,11 @@
  * of the header incompatible.
  */
 #undef	NCURSES_CH_T
-#define NCURSES_CH_T @NCURSES_CH_T@
+#ifdef USE_WIDECHAR
+# define NCURSES_CH_T cchar_t
+#else
+# define NCURSES_CH_T chtype
+#endif
 
 #if @cf_cv_enable_lp64@ && defined(_LP64)
 typedef unsigned chtype;
@@ -336,6 +340,10 @@ typedef	chtype	attr_t;		/* ...must be at least as wide as chtype */
 #include <wchar.h>		/* ...to get mbstate_t, etc. */
 #endif
 
+#ifdef __BIONIC__
+#include <libutf8.h>
+#endif
+
 #if @NCURSES_WCHAR_T@
 typedef unsigned short wchar_t@NCURSES_OK_WCHAR_T@;
 #endif
@@ -356,7 +364,8 @@ typedef struct
 #endif
 }
 cchar_t;
-
+#elif !defined(NCURSES_EXT_COLORS)
+#define NCURSES_EXT_COLORS @NCURSES_PATCH@
 #endif /* _XOPEN_SOURCE_EXTENDED */
 
 #if !NCURSES_OPAQUE
@@ -411,9 +420,9 @@ struct _win_st
 
 #ifdef _XOPEN_SOURCE_EXTENDED
 	cchar_t  _bkgrnd;	/* current background char/attribute pair */
-#if @NCURSES_EXT_COLORS@
-	int	_color;		/* current color-pair for non-space character */
 #endif
+#if (@NCURSES_EXT_COLORS@ || defined(NCURSES_EXT_COLORS))
+	int	_color;		/* current color-pair for non-space character */
 #endif
 };
 #endif /* NCURSES_OPAQUE */
@@ -969,7 +978,7 @@ extern NCURSES_EXPORT(int) wgetscrreg (const WINDOW *, int *, int *); /* generat
 #define wattroff(win,at)	wattr_off(win, NCURSES_CAST(attr_t, at), NULL)
 
 #if !NCURSES_OPAQUE
-#if defined(_XOPEN_SOURCE_EXTENDED) && @NCURSES_EXT_COLORS@
+#if defined(_XOPEN_SOURCE_EXTENDED) && (@NCURSES_EXT_COLORS@ || defined(NCURSES_EXT_COLORS))
 #define wattrset(win,at)	((win)->_color = PAIR_NUMBER(at), \
 				 (win)->_attrs = (at))
 #else
@@ -1111,7 +1120,7 @@ extern NCURSES_EXPORT(int) wgetscrreg (const WINDOW *, int *, int *); /* generat
 #define slk_attr_on(a,v)		((v) ? ERR : slk_attron(a))
 
 #if !NCURSES_OPAQUE
-#if defined(_XOPEN_SOURCE_EXTENDED) && @NCURSES_EXT_COLORS@
+#if defined(_XOPEN_SOURCE_EXTENDED) && (@NCURSES_EXT_COLORS@ || defined(NCURSES_EXT_COLORS))
 #define wattr_set(win,a,p,opts)		((win)->_attrs = ((a) & ~A_COLOR), \
 					 (win)->_color = (p), \
 					 OK)

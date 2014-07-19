@@ -4,8 +4,10 @@
  * This file is part of ncurses, designed to be appended after curses.h.in
  * (see that file for the relevant copyright).
  */
+#ifndef _NCURSESW_CURSES_H
+#define _NCURSESW_CURSES_H
+
 #ifdef _XOPEN_SOURCE_EXTENDED
-#ifdef USE_WIDECHAR
 
 extern NCURSES_EXPORT_VAR(cchar_t *) _nc_wacs;
 
@@ -250,5 +252,6 @@ extern NCURSES_EXPORT(const char *) _nc_viswbuf(const wchar_t *);
 extern NCURSES_EXPORT(const char *) _nc_viswibuf(const wint_t *);
 #endif
 
-#endif /* USE_WIDECHAR */
 #endif /* _XOPEN_SOURCE_EXTENDED */
+
+#endif /* _NCURSESW_CURSES_H */

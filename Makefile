@@ -33,7 +33,7 @@
 
 SHELL = /bin/sh
 
-DESTDIR=
+DESTDIR=/system
 CF_MFLAGS =  DESTDIR="$(DESTDIR)"
 
 
@@ -42,12 +42,12 @@ NCURSES_MAJOR	= 5
 NCURSES_MINOR	= 7
 NCURSES_PATCH	= 20081102
 
-prefix		= /usr/local
+prefix		= /system
 exec_prefix	= ${prefix}
 
 bindir		= ${exec_prefix}/bin
-ticdir		= /usr/local/share/terminfo
-includedir	= ${prefix}/include/ncurses
+ticdir		= /etc/terminfo
+includedir	= ${prefix}/include/ncursesw
 libdir		= ${exec_prefix}/lib
 mandir		= ${prefix}/man
 
@@ -104,6 +104,7 @@ install ::
 	cd form && ${MAKE} ${CF_MFLAGS} $@
 	cd test && ${MAKE} ${CF_MFLAGS} $@
 	cd misc && ${MAKE} ${CF_MFLAGS} $@
+	cd c++ && ${MAKE} ${CF_MFLAGS} $@
 
 libs \
 install.libs \
@@ -171,6 +172,16 @@ uninstall.libs \
 install.test \
 uninstall.test ::
 	cd test && ${MAKE} ${CF_MFLAGS} $@
+
+install.includes \
+uninstall.includes \
+libs \
+lintlib \
+install.libs \
+uninstall.libs \
+install.c++ \
+uninstall.c++ ::
+	cd c++ && ${MAKE} ${CF_MFLAGS} $@
 
 install.libs uninstall.libs \
 install.data uninstall.data ::
