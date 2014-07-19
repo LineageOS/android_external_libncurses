@@ -67,14 +67,14 @@ NCURSES_EXPORT(int) attron (int z)
 #undef attrset
 NCURSES_EXPORT(int) attrset (int z)
 {
-	T((T_CALLED("attrset(%s)"), _traceattr2(0,z))); returnAttr(((stdscr)->_attrs = (z)));
+	T((T_CALLED("attrset(%s)"), _traceattr2(0,z))); returnAttr(((stdscr)->_color = ((int)((((z) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (stdscr)->_attrs = (z)));
 }
 
 
 #undef attr_get
 NCURSES_EXPORT(int) attr_get (attr_t * a1, short * a2, void * z)
 {
-	T((T_CALLED("attr_get(%p,%p,%p)"), a1, a2, z)); returnCode(((void)((a1) != (void *)0 && (*(a1) = (stdscr)->_attrs)), (void)((a2) != (void *)0 && (*(a2) = ((int)(((((stdscr)->_attrs) & ((((1UL) << 8) - 1UL) << ((0) + 8))) >> 8))))), (0)));
+	T((T_CALLED("attr_get(%p,%p,%p)"), a1, a2, z)); returnCode(((void)((a1) != (void *)0 && (*(a1) = (stdscr)->_attrs)), (void)((a2) != (void *)0 && (*(a2) = (stdscr)->_color)), (0)));
 }
 
 
@@ -95,7 +95,7 @@ NCURSES_EXPORT(int) attr_on (attr_t a1, void * z)
 #undef attr_set
 NCURSES_EXPORT(int) attr_set (attr_t a1, short a2, void * z)
 {
-	T((T_CALLED("attr_set(%s,%d,%p)"), _traceattr2(0,a1), a2, z)); returnCode(((stdscr)->_attrs = (((a1) & ~((((1UL) << 8) - 1UL) << ((0) + 8))) | ((a2) << ((0) + 8))), (0)));
+	T((T_CALLED("attr_set(%s,%d,%p)"), _traceattr2(0,a1), a2, z)); returnCode(((stdscr)->_attrs = ((a1) & ~((((1U) << 8) - 1U) << ((0) + 8))), (stdscr)->_color = (a2), (0)));
 }
 
 
@@ -593,7 +593,7 @@ NCURSES_EXPORT(int) mvwvline (WINDOW * a1, int a2, int a3, chtype a4, int z)
 #undef PAIR_NUMBER
 NCURSES_EXPORT(int) PAIR_NUMBER (int z)
 {
-	T((T_CALLED("PAIR_NUMBER(%d)"), z)); returnCode(((int)((((z) & ((((1UL) << 8) - 1UL) << ((0) + 8))) >> 8))));
+	T((T_CALLED("PAIR_NUMBER(%d)"), z)); returnCode(((int)((((z) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))));
 }
 
 
@@ -653,14 +653,14 @@ NCURSES_EXPORT(int) slk_attr_on (attr_t a1, void * z)
 #undef standout
 NCURSES_EXPORT(int) standout (void)
 {
-	T((T_CALLED("standout()"))); returnAttr((((stdscr)->_attrs = (((1UL) << ((8) + 8))))));
+	T((T_CALLED("standout()"))); returnAttr((((stdscr)->_color = ((int)((((((1U) << ((8) + 8))) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (stdscr)->_attrs = (((1U) << ((8) + 8))))));
 }
 
 
 #undef standend
 NCURSES_EXPORT(int) standend (void)
 {
-	T((T_CALLED("standend()"))); returnAttr((((stdscr)->_attrs = ((1UL - 1UL)))));
+	T((T_CALLED("standend()"))); returnAttr((((stdscr)->_color = ((int)(((((1U - 1U)) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (stdscr)->_attrs = ((1U - 1U)))));
 }
 
 
@@ -745,21 +745,21 @@ NCURSES_EXPORT(int) wattroff (WINDOW * a1, int z)
 #undef wattrset
 NCURSES_EXPORT(int) wattrset (WINDOW * a1, int z)
 {
-	T((T_CALLED("wattrset(%p,%d)"), a1, z)); returnAttr(((a1)->_attrs = (z)));
+	T((T_CALLED("wattrset(%p,%d)"), a1, z)); returnAttr(((a1)->_color = ((int)((((z) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (a1)->_attrs = (z)));
 }
 
 
 #undef wattr_get
 NCURSES_EXPORT(int) wattr_get (WINDOW * a1, attr_t * a2, short * a3, void * z)
 {
-	T((T_CALLED("wattr_get(%p,%p,%p,%p)"), a1, a2, a3, z)); returnCode(((void)((a2) != (void *)0 && (*(a2) = (a1)->_attrs)), (void)((a3) != (void *)0 && (*(a3) = ((int)(((((a1)->_attrs) & ((((1UL) << 8) - 1UL) << ((0) + 8))) >> 8))))), (0)));
+	T((T_CALLED("wattr_get(%p,%p,%p,%p)"), a1, a2, a3, z)); returnCode(((void)((a2) != (void *)0 && (*(a2) = (a1)->_attrs)), (void)((a3) != (void *)0 && (*(a3) = (a1)->_color)), (0)));
 }
 
 
 #undef wattr_set
 NCURSES_EXPORT(int) wattr_set (WINDOW * a1, attr_t a2, short a3, void * z)
 {
-	T((T_CALLED("wattr_set(%p,%s,%d,%p)"), a1, _traceattr2(1,a2), a3, z)); returnCode(((a1)->_attrs = (((a2) & ~((((1UL) << 8) - 1UL) << ((0) + 8))) | ((a3) << ((0) + 8))), (0)));
+	T((T_CALLED("wattr_set(%p,%s,%d,%p)"), a1, _traceattr2(1,a2), a3, z)); returnCode(((a1)->_attrs = ((a2) & ~((((1U) << 8) - 1U) << ((0) + 8))), (a1)->_color = (a3), (0)));
 }
 
 
@@ -808,21 +808,21 @@ NCURSES_EXPORT(int) winstr (WINDOW * a1, char * z)
 #undef wstandout
 NCURSES_EXPORT(int) wstandout (WINDOW * z)
 {
-	T((T_CALLED("wstandout(%p)"), z)); returnAttr((((z)->_attrs = (((1UL) << ((8) + 8))))));
+	T((T_CALLED("wstandout(%p)"), z)); returnAttr((((z)->_color = ((int)((((((1U) << ((8) + 8))) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (z)->_attrs = (((1U) << ((8) + 8))))));
 }
 
 
 #undef wstandend
 NCURSES_EXPORT(int) wstandend (WINDOW * z)
 {
-	T((T_CALLED("wstandend(%p)"), z)); returnAttr((((z)->_attrs = ((1UL - 1UL)))));
+	T((T_CALLED("wstandend(%p)"), z)); returnAttr((((z)->_color = ((int)(((((1U - 1U)) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (z)->_attrs = ((1U - 1U)))));
 }
 
 
 #undef getattrs
 NCURSES_EXPORT(int) getattrs (const WINDOW * z)
 {
-	T((T_CALLED("getattrs(%p)"), z)); returnCode(((z) ? (z)->_attrs : (1UL - 1UL)));
+	T((T_CALLED("getattrs(%p)"), z)); returnCode(((z) ? (z)->_attrs : (1U - 1U)));
 }
 
 
@@ -964,6 +964,601 @@ NCURSES_EXPORT(int) wgetscrreg (const WINDOW * a1, int * a2, int * z)
 {
 	T((T_CALLED("wgetscrreg(%p,%p,%p)"), a1, a2, z)); returnCode(((a1) ? (*(a2) = (a1)->_regtop, *(z) = (a1)->_regbottom, (0)) : (-1)));
 }
+
+
+#if USE_WIDEC_SUPPORT
+#undef add_wch
+NCURSES_EXPORT(int) add_wch (const cchar_t * z)
+{
+	T((T_CALLED("add_wch(%p)"), z)); returnCode(add_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef add_wchnstr
+NCURSES_EXPORT(int) add_wchnstr (const cchar_t * a1, int z)
+{
+	T((T_CALLED("add_wchnstr(%p,%d)"), a1, z)); returnCode(add_wchnstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef add_wchstr
+NCURSES_EXPORT(int) add_wchstr (const cchar_t * z)
+{
+	T((T_CALLED("add_wchstr(%p)"), z)); returnCode(add_wchstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef addnwstr
+NCURSES_EXPORT(int) addnwstr (const wchar_t * a1, int z)
+{
+	T((T_CALLED("addnwstr(%p,%d)"), a1, z)); returnCode(addnwstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef addwstr
+NCURSES_EXPORT(int) addwstr (const wchar_t * z)
+{
+	T((T_CALLED("addwstr(%p)"), z)); returnCode(addwstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef bkgrnd
+NCURSES_EXPORT(int) bkgrnd (const cchar_t * z)
+{
+	T((T_CALLED("bkgrnd(%p)"), z)); returnCode(bkgrnd(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef bkgrndset
+NCURSES_EXPORT(void) bkgrndset (const cchar_t * z)
+{
+	T((T_CALLED("bkgrndset(%p)"), z)); bkgrndset(z);
+	returnVoid;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef border_set
+NCURSES_EXPORT(int) border_set (const cchar_t * a1, const cchar_t * a2, const cchar_t * a3, const cchar_t * a4, const cchar_t * a5, const cchar_t * a6, const cchar_t * a7, const cchar_t * z)
+{
+	T((T_CALLED("border_set(%p,%p,%p,%p,%p,%p,%p,%p)"), a1, a2, a3, a4, a5, a6, a7, z)); returnCode(border_set(a1, a2, a3, a4, a5, a6, a7, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef box_set
+NCURSES_EXPORT(int) box_set (WINDOW * a1, const cchar_t * a2, const cchar_t * z)
+{
+	T((T_CALLED("box_set(%p,%p,%p)"), a1, a2, z)); returnCode(box_set(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef echo_wchar
+NCURSES_EXPORT(int) echo_wchar (const cchar_t * z)
+{
+	T((T_CALLED("echo_wchar(%p)"), z)); returnCode(echo_wchar(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef get_wch
+NCURSES_EXPORT(int) get_wch (wint_t * z)
+{
+	T((T_CALLED("get_wch(%p)"), z)); returnCode(get_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef get_wstr
+NCURSES_EXPORT(int) get_wstr (wint_t * z)
+{
+	T((T_CALLED("get_wstr(%p)"), z)); returnCode(get_wstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef getbkgrnd
+NCURSES_EXPORT(int) getbkgrnd (cchar_t * z)
+{
+	T((T_CALLED("getbkgrnd(%p)"), z)); returnCode(getbkgrnd(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef getn_wstr
+NCURSES_EXPORT(int) getn_wstr (wint_t * a1, int z)
+{
+	T((T_CALLED("getn_wstr(%p,%d)"), a1, z)); returnCode(getn_wstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef hline_set
+NCURSES_EXPORT(int) hline_set (const cchar_t * a1, int z)
+{
+	T((T_CALLED("hline_set(%p,%d)"), a1, z)); returnCode(hline_set(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef in_wch
+NCURSES_EXPORT(int) in_wch (cchar_t * z)
+{
+	T((T_CALLED("in_wch(%p)"), z)); returnCode(in_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef in_wchnstr
+NCURSES_EXPORT(int) in_wchnstr (cchar_t * a1, int z)
+{
+	T((T_CALLED("in_wchnstr(%p,%d)"), a1, z)); returnCode(in_wchnstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef in_wchstr
+NCURSES_EXPORT(int) in_wchstr (cchar_t * z)
+{
+	T((T_CALLED("in_wchstr(%p)"), z)); returnCode(in_wchstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef innwstr
+NCURSES_EXPORT(int) innwstr (wchar_t * a1, int z)
+{
+	return innwstr(a1, z) ;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef ins_nwstr
+NCURSES_EXPORT(int) ins_nwstr (const wchar_t * a1, int z)
+{
+	T((T_CALLED("ins_nwstr(%p,%d)"), a1, z)); returnCode(ins_nwstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef ins_wch
+NCURSES_EXPORT(int) ins_wch (const cchar_t * z)
+{
+	T((T_CALLED("ins_wch(%p)"), z)); returnCode(ins_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef ins_wstr
+NCURSES_EXPORT(int) ins_wstr (const wchar_t * z)
+{
+	T((T_CALLED("ins_wstr(%p)"), z)); returnCode(ins_wstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef inwstr
+NCURSES_EXPORT(int) inwstr (wchar_t * z)
+{
+	T((T_CALLED("inwstr(%p)"), z)); returnCode(inwstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvadd_wch
+NCURSES_EXPORT(int) mvadd_wch (int a1, int a2, const cchar_t * z)
+{
+	T((T_CALLED("mvadd_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvadd_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvadd_wchnstr
+NCURSES_EXPORT(int) mvadd_wchnstr (int a1, int a2, const cchar_t * a3, int z)
+{
+	T((T_CALLED("mvadd_wchnstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvadd_wchnstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvadd_wchstr
+NCURSES_EXPORT(int) mvadd_wchstr (int a1, int a2, const cchar_t * z)
+{
+	T((T_CALLED("mvadd_wchstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvadd_wchstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvaddnwstr
+NCURSES_EXPORT(int) mvaddnwstr (int a1, int a2, const wchar_t * a3, int z)
+{
+	T((T_CALLED("mvaddnwstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvaddnwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvaddwstr
+NCURSES_EXPORT(int) mvaddwstr (int a1, int a2, const wchar_t * z)
+{
+	T((T_CALLED("mvaddwstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvaddwstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvget_wch
+NCURSES_EXPORT(int) mvget_wch (int a1, int a2, wint_t * z)
+{
+	T((T_CALLED("mvget_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvget_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvget_wstr
+NCURSES_EXPORT(int) mvget_wstr (int a1, int a2, wint_t * z)
+{
+	T((T_CALLED("mvget_wstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvget_wstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvgetn_wstr
+NCURSES_EXPORT(int) mvgetn_wstr (int a1, int a2, wint_t * a3, int z)
+{
+	T((T_CALLED("mvgetn_wstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvgetn_wstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvhline_set
+NCURSES_EXPORT(int) mvhline_set (int a1, int a2, const cchar_t * a3, int z)
+{
+	T((T_CALLED("mvhline_set(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvhline_set(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvin_wch
+NCURSES_EXPORT(int) mvin_wch (int a1, int a2, cchar_t * z)
+{
+	T((T_CALLED("mvin_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvin_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvin_wchnstr
+NCURSES_EXPORT(int) mvin_wchnstr (int a1, int a2, cchar_t * a3, int z)
+{
+	T((T_CALLED("mvin_wchnstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvin_wchnstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvin_wchstr
+NCURSES_EXPORT(int) mvin_wchstr (int a1, int a2, cchar_t * z)
+{
+	T((T_CALLED("mvin_wchstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvin_wchstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvinnwstr
+NCURSES_EXPORT(int) mvinnwstr (int a1, int a2, wchar_t * a3, int z)
+{
+	return mvinnwstr(a1, a2, a3, z) ;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvins_nwstr
+NCURSES_EXPORT(int) mvins_nwstr (int a1, int a2, const wchar_t * a3, int z)
+{
+	T((T_CALLED("mvins_nwstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvins_nwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvins_wch
+NCURSES_EXPORT(int) mvins_wch (int a1, int a2, const cchar_t * z)
+{
+	T((T_CALLED("mvins_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvins_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvins_wstr
+NCURSES_EXPORT(int) mvins_wstr (int a1, int a2, const wchar_t * z)
+{
+	T((T_CALLED("mvins_wstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvins_wstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvinwstr
+NCURSES_EXPORT(int) mvinwstr (int a1, int a2, wchar_t * z)
+{
+	T((T_CALLED("mvinwstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvinwstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvvline_set
+NCURSES_EXPORT(int) mvvline_set (int a1, int a2, const cchar_t * a3, int z)
+{
+	T((T_CALLED("mvvline_set(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvvline_set(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwadd_wch
+NCURSES_EXPORT(int) mvwadd_wch (WINDOW * a1, int a2, int a3, const cchar_t * z)
+{
+	T((T_CALLED("mvwadd_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwadd_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwadd_wchnstr
+NCURSES_EXPORT(int) mvwadd_wchnstr (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwadd_wchnstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwadd_wchnstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwadd_wchstr
+NCURSES_EXPORT(int) mvwadd_wchstr (WINDOW * a1, int a2, int a3, const cchar_t * z)
+{
+	T((T_CALLED("mvwadd_wchstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwadd_wchstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwaddnwstr
+NCURSES_EXPORT(int) mvwaddnwstr (WINDOW * a1, int a2, int a3, const wchar_t * a4, int z)
+{
+	T((T_CALLED("mvwaddnwstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwaddnwstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwaddwstr
+NCURSES_EXPORT(int) mvwaddwstr (WINDOW * a1, int a2, int a3, const wchar_t * z)
+{
+	T((T_CALLED("mvwaddwstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwaddwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwget_wch
+NCURSES_EXPORT(int) mvwget_wch (WINDOW * a1, int a2, int a3, wint_t * z)
+{
+	T((T_CALLED("mvwget_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwget_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwget_wstr
+NCURSES_EXPORT(int) mvwget_wstr (WINDOW * a1, int a2, int a3, wint_t * z)
+{
+	T((T_CALLED("mvwget_wstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwget_wstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwgetn_wstr
+NCURSES_EXPORT(int) mvwgetn_wstr (WINDOW * a1, int a2, int a3, wint_t * a4, int z)
+{
+	T((T_CALLED("mvwgetn_wstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwgetn_wstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwhline_set
+NCURSES_EXPORT(int) mvwhline_set (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwhline_set(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwhline_set(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwin_wch
+NCURSES_EXPORT(int) mvwin_wch (WINDOW * a1, int a2, int a3, cchar_t * z)
+{
+	T((T_CALLED("mvwin_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwin_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwin_wchnstr
+NCURSES_EXPORT(int) mvwin_wchnstr (WINDOW * a1, int a2, int a3, cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwin_wchnstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwin_wchnstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwin_wchstr
+NCURSES_EXPORT(int) mvwin_wchstr (WINDOW * a1, int a2, int a3, cchar_t * z)
+{
+	T((T_CALLED("mvwin_wchstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwin_wchstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwinnwstr
+NCURSES_EXPORT(int) mvwinnwstr (WINDOW * a1, int a2, int a3, wchar_t * a4, int z)
+{
+	return mvwinnwstr(a1, a2, a3, a4, z) ;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwins_nwstr
+NCURSES_EXPORT(int) mvwins_nwstr (WINDOW * a1, int a2, int a3, const wchar_t * a4, int z)
+{
+	T((T_CALLED("mvwins_nwstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwins_nwstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwins_wch
+NCURSES_EXPORT(int) mvwins_wch (WINDOW * a1, int a2, int a3, const cchar_t * z)
+{
+	T((T_CALLED("mvwins_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwins_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwins_wstr
+NCURSES_EXPORT(int) mvwins_wstr (WINDOW * a1, int a2, int a3, const wchar_t * z)
+{
+	T((T_CALLED("mvwins_wstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwins_wstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwinwstr
+NCURSES_EXPORT(int) mvwinwstr (WINDOW * a1, int a2, int a3, wchar_t * z)
+{
+	T((T_CALLED("mvwinwstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwinwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef mvwvline_set
+NCURSES_EXPORT(int) mvwvline_set (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwvline_set(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwvline_set(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef vline_set
+NCURSES_EXPORT(int) vline_set (const cchar_t * a1, int z)
+{
+	T((T_CALLED("vline_set(%p,%d)"), a1, z)); returnCode(vline_set(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef wadd_wchstr
+NCURSES_EXPORT(int) wadd_wchstr (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wadd_wchstr(%p,%p)"), a1, z)); returnCode(wadd_wchstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef waddwstr
+NCURSES_EXPORT(int) waddwstr (WINDOW * a1, const wchar_t * z)
+{
+	T((T_CALLED("waddwstr(%p,%p)"), a1, z)); returnCode(waddwstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef wget_wstr
+NCURSES_EXPORT(int) wget_wstr (WINDOW * a1, wint_t * z)
+{
+	T((T_CALLED("wget_wstr(%p,%p)"), a1, z)); returnCode(wget_wstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef wgetbkgrnd
+NCURSES_EXPORT(int) wgetbkgrnd (WINDOW * a1, cchar_t * z)
+{
+	T((T_CALLED("wgetbkgrnd(%p,%p)"), a1, z)); returnCode(wgetbkgrnd(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef win_wchstr
+NCURSES_EXPORT(int) win_wchstr (WINDOW * a1, cchar_t * z)
+{
+	T((T_CALLED("win_wchstr(%p,%p)"), a1, z)); returnCode(win_wchstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+#undef wins_wstr
+NCURSES_EXPORT(int) wins_wstr (WINDOW * a1, const wchar_t * z)
+{
+	T((T_CALLED("wins_wstr(%p,%p)"), a1, z)); returnCode(wins_wstr(a1, z));
+}
+#endif
 
 
 #undef mouse_trafo

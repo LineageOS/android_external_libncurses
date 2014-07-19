@@ -58,14 +58,14 @@ int call_attron (int z)
 extern int call_attrset (int z);
 int call_attrset (int z)
 {
-	T((T_CALLED("attrset(%s)"), _traceattr2(0,z))); returnAttr(((stdscr)->_attrs = (z)));
+	T((T_CALLED("attrset(%s)"), _traceattr2(0,z))); returnAttr(((stdscr)->_color = ((int)((((z) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (stdscr)->_attrs = (z)));
 }
 
 
 extern int call_attr_get (attr_t * a1, short * a2, void * z);
 int call_attr_get (attr_t * a1, short * a2, void * z)
 {
-	T((T_CALLED("attr_get(%p,%p,%p)"), a1, a2, z)); returnCode(((void)((a1) != (void *)0 && (*(a1) = (stdscr)->_attrs)), (void)((a2) != (void *)0 && (*(a2) = ((int)(((((stdscr)->_attrs) & ((((1UL) << 8) - 1UL) << ((0) + 8))) >> 8))))), (0)));
+	T((T_CALLED("attr_get(%p,%p,%p)"), a1, a2, z)); returnCode(((void)((a1) != (void *)0 && (*(a1) = (stdscr)->_attrs)), (void)((a2) != (void *)0 && (*(a2) = (stdscr)->_color)), (0)));
 }
 
 
@@ -86,7 +86,7 @@ int call_attr_on (attr_t a1, void * z)
 extern int call_attr_set (attr_t a1, short a2, void * z);
 int call_attr_set (attr_t a1, short a2, void * z)
 {
-	T((T_CALLED("attr_set(%s,%d,%p)"), _traceattr2(0,a1), a2, z)); returnCode(((stdscr)->_attrs = (((a1) & ~((((1UL) << 8) - 1UL) << ((0) + 8))) | ((a2) << ((0) + 8))), (0)));
+	T((T_CALLED("attr_set(%s,%d,%p)"), _traceattr2(0,a1), a2, z)); returnCode(((stdscr)->_attrs = ((a1) & ~((((1U) << 8) - 1U) << ((0) + 8))), (stdscr)->_color = (a2), (0)));
 }
 
 
@@ -1016,7 +1016,7 @@ int call_pair_content (short a1, short * a2, short * z)
 extern int call_PAIR_NUMBER (int z);
 int call_PAIR_NUMBER (int z)
 {
-	T((T_CALLED("PAIR_NUMBER(%d)"), z)); returnCode(((int)((((z) & ((((1UL) << 8) - 1UL) << ((0) + 8))) >> 8))));
+	T((T_CALLED("PAIR_NUMBER(%d)"), z)); returnCode(((int)((((z) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))));
 }
 
 
@@ -1294,14 +1294,14 @@ int call_slk_touch (void)
 extern int call_standout (void);
 int call_standout (void)
 {
-	T((T_CALLED("standout()"))); returnAttr((((stdscr)->_attrs = (((1UL) << ((8) + 8))))));
+	T((T_CALLED("standout()"))); returnAttr((((stdscr)->_color = ((int)((((((1U) << ((8) + 8))) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (stdscr)->_attrs = (((1U) << ((8) + 8))))));
 }
 
 
 extern int call_standend (void);
 int call_standend (void)
 {
-	T((T_CALLED("standend()"))); returnAttr((((stdscr)->_attrs = ((1UL - 1UL)))));
+	T((T_CALLED("standend()"))); returnAttr((((stdscr)->_color = ((int)(((((1U - 1U)) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (stdscr)->_attrs = ((1U - 1U)))));
 }
 
 
@@ -1499,14 +1499,14 @@ int call_wattroff (WINDOW * a1, int z)
 extern int call_wattrset (WINDOW * a1, int z);
 int call_wattrset (WINDOW * a1, int z)
 {
-	T((T_CALLED("wattrset(%p,%d)"), a1, z)); returnAttr(((a1)->_attrs = (z)));
+	T((T_CALLED("wattrset(%p,%d)"), a1, z)); returnAttr(((a1)->_color = ((int)((((z) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (a1)->_attrs = (z)));
 }
 
 
 extern int call_wattr_get (WINDOW * a1, attr_t * a2, short * a3, void * z);
 int call_wattr_get (WINDOW * a1, attr_t * a2, short * a3, void * z)
 {
-	T((T_CALLED("wattr_get(%p,%p,%p,%p)"), a1, a2, a3, z)); returnCode(((void)((a2) != (void *)0 && (*(a2) = (a1)->_attrs)), (void)((a3) != (void *)0 && (*(a3) = ((int)(((((a1)->_attrs) & ((((1UL) << 8) - 1UL) << ((0) + 8))) >> 8))))), (0)));
+	T((T_CALLED("wattr_get(%p,%p,%p,%p)"), a1, a2, a3, z)); returnCode(((void)((a2) != (void *)0 && (*(a2) = (a1)->_attrs)), (void)((a3) != (void *)0 && (*(a3) = (a1)->_color)), (0)));
 }
 
 
@@ -1527,7 +1527,7 @@ int call_wattr_off (WINDOW * a1, attr_t a2, void * z)
 extern int call_wattr_set (WINDOW * a1, attr_t a2, short a3, void * z);
 int call_wattr_set (WINDOW * a1, attr_t a2, short a3, void * z)
 {
-	T((T_CALLED("wattr_set(%p,%s,%d,%p)"), a1, _traceattr2(1,a2), a3, z)); returnCode(((a1)->_attrs = (((a2) & ~((((1UL) << 8) - 1UL) << ((0) + 8))) | ((a3) << ((0) + 8))), (0)));
+	T((T_CALLED("wattr_set(%p,%s,%d,%p)"), a1, _traceattr2(1,a2), a3, z)); returnCode(((a1)->_attrs = ((a2) & ~((((1U) << 8) - 1U) << ((0) + 8))), (a1)->_color = (a3), (0)));
 }
 
 
@@ -1767,14 +1767,14 @@ int call_wsetscrreg (WINDOW * a1, int a2, int z)
 extern int call_wstandout (WINDOW * z);
 int call_wstandout (WINDOW * z)
 {
-	T((T_CALLED("wstandout(%p)"), z)); returnAttr((((z)->_attrs = (((1UL) << ((8) + 8))))));
+	T((T_CALLED("wstandout(%p)"), z)); returnAttr((((z)->_color = ((int)((((((1U) << ((8) + 8))) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (z)->_attrs = (((1U) << ((8) + 8))))));
 }
 
 
 extern int call_wstandend (WINDOW * z);
 int call_wstandend (WINDOW * z)
 {
-	T((T_CALLED("wstandend(%p)"), z)); returnAttr((((z)->_attrs = ((1UL - 1UL)))));
+	T((T_CALLED("wstandend(%p)"), z)); returnAttr((((z)->_color = ((int)(((((1U - 1U)) & ((((1U) << 8) - 1U) << ((0) + 8))) >> 8))), (z)->_attrs = ((1U - 1U)))));
 }
 
 
@@ -1847,7 +1847,7 @@ int call_putp (const char * z)
 extern int call_getattrs (const WINDOW * z);
 int call_getattrs (const WINDOW * z)
 {
-	T((T_CALLED("getattrs(%p)"), z)); returnCode(((z) ? (z)->_attrs : (1UL - 1UL)));
+	T((T_CALLED("getattrs(%p)"), z)); returnCode(((z) ? (z)->_attrs : (1U - 1U)));
 }
 
 
@@ -1988,6 +1988,805 @@ extern int call_wgetscrreg (const WINDOW * a1, int * a2, int * z);
 int call_wgetscrreg (const WINDOW * a1, int * a2, int * z)
 {
 	T((T_CALLED("wgetscrreg(%p,%p,%p)"), a1, a2, z)); returnCode(((a1) ? (*(a2) = (a1)->_regtop, *(z) = (a1)->_regbottom, (0)) : (-1)));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_add_wch (const cchar_t * z);
+int call_add_wch (const cchar_t * z)
+{
+	T((T_CALLED("add_wch(%p)"), z)); returnCode(add_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_add_wchnstr (const cchar_t * a1, int z);
+int call_add_wchnstr (const cchar_t * a1, int z)
+{
+	T((T_CALLED("add_wchnstr(%p,%d)"), a1, z)); returnCode(add_wchnstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_add_wchstr (const cchar_t * z);
+int call_add_wchstr (const cchar_t * z)
+{
+	T((T_CALLED("add_wchstr(%p)"), z)); returnCode(add_wchstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_addnwstr (const wchar_t * a1, int z);
+int call_addnwstr (const wchar_t * a1, int z)
+{
+	T((T_CALLED("addnwstr(%p,%d)"), a1, z)); returnCode(addnwstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_addwstr (const wchar_t * z);
+int call_addwstr (const wchar_t * z)
+{
+	T((T_CALLED("addwstr(%p)"), z)); returnCode(addwstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_bkgrnd (const cchar_t * z);
+int call_bkgrnd (const cchar_t * z)
+{
+	T((T_CALLED("bkgrnd(%p)"), z)); returnCode(bkgrnd(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern void call_bkgrndset (const cchar_t * z);
+void call_bkgrndset (const cchar_t * z)
+{
+	T((T_CALLED("bkgrndset(%p)"), z)); bkgrndset(z);
+	returnVoid;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_border_set (const cchar_t * a1, const cchar_t * a2, const cchar_t * a3, const cchar_t * a4, const cchar_t * a5, const cchar_t * a6, const cchar_t * a7, const cchar_t * z);
+int call_border_set (const cchar_t * a1, const cchar_t * a2, const cchar_t * a3, const cchar_t * a4, const cchar_t * a5, const cchar_t * a6, const cchar_t * a7, const cchar_t * z)
+{
+	T((T_CALLED("border_set(%p,%p,%p,%p,%p,%p,%p,%p)"), a1, a2, a3, a4, a5, a6, a7, z)); returnCode(border_set(a1, a2, a3, a4, a5, a6, a7, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_box_set (WINDOW * a1, const cchar_t * a2, const cchar_t * z);
+int call_box_set (WINDOW * a1, const cchar_t * a2, const cchar_t * z)
+{
+	T((T_CALLED("box_set(%p,%p,%p)"), a1, a2, z)); returnCode(box_set(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_echo_wchar (const cchar_t * z);
+int call_echo_wchar (const cchar_t * z)
+{
+	T((T_CALLED("echo_wchar(%p)"), z)); returnCode(echo_wchar(z));
+}
+#endif
+
+
+extern int call_erasewchar (wchar_t * z);
+int call_erasewchar (wchar_t * z)
+{
+	T((T_CALLED("erasewchar(%p)"), z)); returnCode(erasewchar(z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_get_wch (wint_t * z);
+int call_get_wch (wint_t * z)
+{
+	T((T_CALLED("get_wch(%p)"), z)); returnCode(get_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_get_wstr (wint_t * z);
+int call_get_wstr (wint_t * z)
+{
+	T((T_CALLED("get_wstr(%p)"), z)); returnCode(get_wstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_getbkgrnd (cchar_t * z);
+int call_getbkgrnd (cchar_t * z)
+{
+	T((T_CALLED("getbkgrnd(%p)"), z)); returnCode(getbkgrnd(z));
+}
+#endif
+
+
+extern int call_getcchar (const cchar_t * a1, wchar_t * a2, attr_t * a3, short * a4, void * z);
+int call_getcchar (const cchar_t * a1, wchar_t * a2, attr_t * a3, short * a4, void * z)
+{
+	T((T_CALLED("getcchar(%p,%p,%p,%p,%p)"), a1, a2, a3, a4, z)); returnCode(getcchar(a1, a2, a3, a4, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_getn_wstr (wint_t * a1, int z);
+int call_getn_wstr (wint_t * a1, int z)
+{
+	T((T_CALLED("getn_wstr(%p,%d)"), a1, z)); returnCode(getn_wstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_hline_set (const cchar_t * a1, int z);
+int call_hline_set (const cchar_t * a1, int z)
+{
+	T((T_CALLED("hline_set(%p,%d)"), a1, z)); returnCode(hline_set(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_in_wch (cchar_t * z);
+int call_in_wch (cchar_t * z)
+{
+	T((T_CALLED("in_wch(%p)"), z)); returnCode(in_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_in_wchnstr (cchar_t * a1, int z);
+int call_in_wchnstr (cchar_t * a1, int z)
+{
+	T((T_CALLED("in_wchnstr(%p,%d)"), a1, z)); returnCode(in_wchnstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_in_wchstr (cchar_t * z);
+int call_in_wchstr (cchar_t * z)
+{
+	T((T_CALLED("in_wchstr(%p)"), z)); returnCode(in_wchstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_innwstr (wchar_t * a1, int z);
+int call_innwstr (wchar_t * a1, int z)
+{
+	return innwstr(a1, z) ;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_ins_nwstr (const wchar_t * a1, int z);
+int call_ins_nwstr (const wchar_t * a1, int z)
+{
+	T((T_CALLED("ins_nwstr(%p,%d)"), a1, z)); returnCode(ins_nwstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_ins_wch (const cchar_t * z);
+int call_ins_wch (const cchar_t * z)
+{
+	T((T_CALLED("ins_wch(%p)"), z)); returnCode(ins_wch(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_ins_wstr (const wchar_t * z);
+int call_ins_wstr (const wchar_t * z)
+{
+	T((T_CALLED("ins_wstr(%p)"), z)); returnCode(ins_wstr(z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_inwstr (wchar_t * z);
+int call_inwstr (wchar_t * z)
+{
+	T((T_CALLED("inwstr(%p)"), z)); returnCode(inwstr(z));
+}
+#endif
+
+
+extern char * call_key_name (wchar_t z);
+char * call_key_name (wchar_t z)
+{
+	T((T_CALLED("(%#lx)"), (long)z)); returnPtr(key_name(z));
+}
+
+
+extern int call_killwchar (wchar_t * z);
+int call_killwchar (wchar_t * z)
+{
+	T((T_CALLED("killwchar(%p)"), z)); returnCode(killwchar(z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvadd_wch (int a1, int a2, const cchar_t * z);
+int call_mvadd_wch (int a1, int a2, const cchar_t * z)
+{
+	T((T_CALLED("mvadd_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvadd_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvadd_wchnstr (int a1, int a2, const cchar_t * a3, int z);
+int call_mvadd_wchnstr (int a1, int a2, const cchar_t * a3, int z)
+{
+	T((T_CALLED("mvadd_wchnstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvadd_wchnstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvadd_wchstr (int a1, int a2, const cchar_t * z);
+int call_mvadd_wchstr (int a1, int a2, const cchar_t * z)
+{
+	T((T_CALLED("mvadd_wchstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvadd_wchstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvaddnwstr (int a1, int a2, const wchar_t * a3, int z);
+int call_mvaddnwstr (int a1, int a2, const wchar_t * a3, int z)
+{
+	T((T_CALLED("mvaddnwstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvaddnwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvaddwstr (int a1, int a2, const wchar_t * z);
+int call_mvaddwstr (int a1, int a2, const wchar_t * z)
+{
+	T((T_CALLED("mvaddwstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvaddwstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvget_wch (int a1, int a2, wint_t * z);
+int call_mvget_wch (int a1, int a2, wint_t * z)
+{
+	T((T_CALLED("mvget_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvget_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvget_wstr (int a1, int a2, wint_t * z);
+int call_mvget_wstr (int a1, int a2, wint_t * z)
+{
+	T((T_CALLED("mvget_wstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvget_wstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvgetn_wstr (int a1, int a2, wint_t * a3, int z);
+int call_mvgetn_wstr (int a1, int a2, wint_t * a3, int z)
+{
+	T((T_CALLED("mvgetn_wstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvgetn_wstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvhline_set (int a1, int a2, const cchar_t * a3, int z);
+int call_mvhline_set (int a1, int a2, const cchar_t * a3, int z)
+{
+	T((T_CALLED("mvhline_set(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvhline_set(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvin_wch (int a1, int a2, cchar_t * z);
+int call_mvin_wch (int a1, int a2, cchar_t * z)
+{
+	T((T_CALLED("mvin_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvin_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvin_wchnstr (int a1, int a2, cchar_t * a3, int z);
+int call_mvin_wchnstr (int a1, int a2, cchar_t * a3, int z)
+{
+	T((T_CALLED("mvin_wchnstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvin_wchnstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvin_wchstr (int a1, int a2, cchar_t * z);
+int call_mvin_wchstr (int a1, int a2, cchar_t * z)
+{
+	T((T_CALLED("mvin_wchstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvin_wchstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvinnwstr (int a1, int a2, wchar_t * a3, int z);
+int call_mvinnwstr (int a1, int a2, wchar_t * a3, int z)
+{
+	return mvinnwstr(a1, a2, a3, z) ;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvins_nwstr (int a1, int a2, const wchar_t * a3, int z);
+int call_mvins_nwstr (int a1, int a2, const wchar_t * a3, int z)
+{
+	T((T_CALLED("mvins_nwstr(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvins_nwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvins_wch (int a1, int a2, const cchar_t * z);
+int call_mvins_wch (int a1, int a2, const cchar_t * z)
+{
+	T((T_CALLED("mvins_wch(%d,%d,%p)"), a1, a2, z)); returnCode(mvins_wch(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvins_wstr (int a1, int a2, const wchar_t * z);
+int call_mvins_wstr (int a1, int a2, const wchar_t * z)
+{
+	T((T_CALLED("mvins_wstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvins_wstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvinwstr (int a1, int a2, wchar_t * z);
+int call_mvinwstr (int a1, int a2, wchar_t * z)
+{
+	T((T_CALLED("mvinwstr(%d,%d,%p)"), a1, a2, z)); returnCode(mvinwstr(a1, a2, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvvline_set (int a1, int a2, const cchar_t * a3, int z);
+int call_mvvline_set (int a1, int a2, const cchar_t * a3, int z)
+{
+	T((T_CALLED("mvvline_set(%d,%d,%p,%d)"), a1, a2, a3, z)); returnCode(mvvline_set(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwadd_wch (WINDOW * a1, int a2, int a3, const cchar_t * z);
+int call_mvwadd_wch (WINDOW * a1, int a2, int a3, const cchar_t * z)
+{
+	T((T_CALLED("mvwadd_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwadd_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwadd_wchnstr (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z);
+int call_mvwadd_wchnstr (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwadd_wchnstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwadd_wchnstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwadd_wchstr (WINDOW * a1, int a2, int a3, const cchar_t * z);
+int call_mvwadd_wchstr (WINDOW * a1, int a2, int a3, const cchar_t * z)
+{
+	T((T_CALLED("mvwadd_wchstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwadd_wchstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwaddnwstr (WINDOW * a1, int a2, int a3, const wchar_t * a4, int z);
+int call_mvwaddnwstr (WINDOW * a1, int a2, int a3, const wchar_t * a4, int z)
+{
+	T((T_CALLED("mvwaddnwstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwaddnwstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwaddwstr (WINDOW * a1, int a2, int a3, const wchar_t * z);
+int call_mvwaddwstr (WINDOW * a1, int a2, int a3, const wchar_t * z)
+{
+	T((T_CALLED("mvwaddwstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwaddwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwget_wch (WINDOW * a1, int a2, int a3, wint_t * z);
+int call_mvwget_wch (WINDOW * a1, int a2, int a3, wint_t * z)
+{
+	T((T_CALLED("mvwget_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwget_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwget_wstr (WINDOW * a1, int a2, int a3, wint_t * z);
+int call_mvwget_wstr (WINDOW * a1, int a2, int a3, wint_t * z)
+{
+	T((T_CALLED("mvwget_wstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwget_wstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwgetn_wstr (WINDOW * a1, int a2, int a3, wint_t * a4, int z);
+int call_mvwgetn_wstr (WINDOW * a1, int a2, int a3, wint_t * a4, int z)
+{
+	T((T_CALLED("mvwgetn_wstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwgetn_wstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwhline_set (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z);
+int call_mvwhline_set (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwhline_set(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwhline_set(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwin_wch (WINDOW * a1, int a2, int a3, cchar_t * z);
+int call_mvwin_wch (WINDOW * a1, int a2, int a3, cchar_t * z)
+{
+	T((T_CALLED("mvwin_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwin_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwin_wchnstr (WINDOW * a1, int a2, int a3, cchar_t * a4, int z);
+int call_mvwin_wchnstr (WINDOW * a1, int a2, int a3, cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwin_wchnstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwin_wchnstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwin_wchstr (WINDOW * a1, int a2, int a3, cchar_t * z);
+int call_mvwin_wchstr (WINDOW * a1, int a2, int a3, cchar_t * z)
+{
+	T((T_CALLED("mvwin_wchstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwin_wchstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwinnwstr (WINDOW * a1, int a2, int a3, wchar_t * a4, int z);
+int call_mvwinnwstr (WINDOW * a1, int a2, int a3, wchar_t * a4, int z)
+{
+	return mvwinnwstr(a1, a2, a3, a4, z) ;
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwins_nwstr (WINDOW * a1, int a2, int a3, const wchar_t * a4, int z);
+int call_mvwins_nwstr (WINDOW * a1, int a2, int a3, const wchar_t * a4, int z)
+{
+	T((T_CALLED("mvwins_nwstr(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwins_nwstr(a1, a2, a3, a4, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwins_wch (WINDOW * a1, int a2, int a3, const cchar_t * z);
+int call_mvwins_wch (WINDOW * a1, int a2, int a3, const cchar_t * z)
+{
+	T((T_CALLED("mvwins_wch(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwins_wch(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwins_wstr (WINDOW * a1, int a2, int a3, const wchar_t * z);
+int call_mvwins_wstr (WINDOW * a1, int a2, int a3, const wchar_t * z)
+{
+	T((T_CALLED("mvwins_wstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwins_wstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwinwstr (WINDOW * a1, int a2, int a3, wchar_t * z);
+int call_mvwinwstr (WINDOW * a1, int a2, int a3, wchar_t * z)
+{
+	T((T_CALLED("mvwinwstr(%p,%d,%d,%p)"), a1, a2, a3, z)); returnCode(mvwinwstr(a1, a2, a3, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_mvwvline_set (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z);
+int call_mvwvline_set (WINDOW * a1, int a2, int a3, const cchar_t * a4, int z)
+{
+	T((T_CALLED("mvwvline_set(%p,%d,%d,%p,%d)"), a1, a2, a3, a4, z)); returnCode(mvwvline_set(a1, a2, a3, a4, z));
+}
+#endif
+
+
+extern int call_pecho_wchar (WINDOW * a1, const cchar_t * z);
+int call_pecho_wchar (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("pecho_wchar(%p,%p)"), a1, z)); returnCode(pecho_wchar(a1, z));
+}
+
+
+extern int call_setcchar (cchar_t * a1, const wchar_t * a2, const attr_t a3, short a4, const void * z);
+int call_setcchar (cchar_t * a1, const wchar_t * a2, const attr_t a3, short a4, const void * z)
+{
+	T((T_CALLED("setcchar(%p,%p,%s,%d,%p)"), a1, a2, _traceattr2(2,a3), a4, z)); returnCode(setcchar(a1, a2, a3, a4, z));
+}
+
+
+extern int call_slk_wset (int a1, const wchar_t * a2, int z);
+int call_slk_wset (int a1, const wchar_t * a2, int z)
+{
+	T((T_CALLED("slk_wset(%d,%p,%d)"), a1, a2, z)); returnCode(slk_wset(a1, a2, z));
+}
+
+
+extern attr_t call_term_attrs (void);
+attr_t call_term_attrs (void)
+{
+	T((T_CALLED("term_attrs()"))); returnAttr(term_attrs());
+}
+
+
+extern int call_unget_wch (const wchar_t z);
+int call_unget_wch (const wchar_t z)
+{
+	T((T_CALLED("unget_wch(%#lx)"), (long)z)); returnCode(unget_wch(z));
+}
+
+
+extern int call_vid_attr (attr_t a1, short a2, void * z);
+int call_vid_attr (attr_t a1, short a2, void * z)
+{
+	T((T_CALLED("vid_attr(%s,%d,%p)"), _traceattr2(0,a1), a2, z)); returnCode(vid_attr(a1, a2, z));
+}
+
+
+extern int call_vid_puts (attr_t a1, short a2, void * a3, int(* z)(int));
+int call_vid_puts (attr_t a1, short a2, void * a3, int(* z)(int))
+{
+	T((T_CALLED("vid_puts(%s,%d,%p,"), _traceattr2(0,a1), a2, a3)); returnCode(vid_puts(a1, a2, a3, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_vline_set (const cchar_t * a1, int z);
+int call_vline_set (const cchar_t * a1, int z)
+{
+	T((T_CALLED("vline_set(%p,%d)"), a1, z)); returnCode(vline_set(a1, z));
+}
+#endif
+
+
+extern int call_wadd_wch (WINDOW * a1, const cchar_t * z);
+int call_wadd_wch (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wadd_wch(%p,%p)"), a1, z)); returnCode(wadd_wch(a1, z));
+}
+
+
+extern int call_wadd_wchnstr (WINDOW * a1, const cchar_t * a2, int z);
+int call_wadd_wchnstr (WINDOW * a1, const cchar_t * a2, int z)
+{
+	T((T_CALLED("wadd_wchnstr(%p,%p,%d)"), a1, a2, z)); returnCode(wadd_wchnstr(a1, a2, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_wadd_wchstr (WINDOW * a1, const cchar_t * z);
+int call_wadd_wchstr (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wadd_wchstr(%p,%p)"), a1, z)); returnCode(wadd_wchstr(a1, z));
+}
+#endif
+
+
+extern int call_waddnwstr (WINDOW * a1, const wchar_t * a2, int z);
+int call_waddnwstr (WINDOW * a1, const wchar_t * a2, int z)
+{
+	T((T_CALLED("waddnwstr(%p,%p,%d)"), a1, a2, z)); returnCode(waddnwstr(a1, a2, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_waddwstr (WINDOW * a1, const wchar_t * z);
+int call_waddwstr (WINDOW * a1, const wchar_t * z)
+{
+	T((T_CALLED("waddwstr(%p,%p)"), a1, z)); returnCode(waddwstr(a1, z));
+}
+#endif
+
+
+extern int call_wbkgrnd (WINDOW * a1, const cchar_t * z);
+int call_wbkgrnd (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wbkgrnd(%p,%p)"), a1, z)); returnCode(wbkgrnd(a1, z));
+}
+
+
+extern void call_wbkgrndset (WINDOW * a1, const cchar_t * z);
+void call_wbkgrndset (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wbkgrndset(%p,%p)"), a1, z)); wbkgrndset(a1, z);
+	returnVoid;
+}
+
+
+extern int call_wborder_set (WINDOW * a1, const cchar_t * a2, const cchar_t * a3, const cchar_t * a4, const cchar_t * a5, const cchar_t * a6, const cchar_t * a7, const cchar_t * a8, const cchar_t * z);
+int call_wborder_set (WINDOW * a1, const cchar_t * a2, const cchar_t * a3, const cchar_t * a4, const cchar_t * a5, const cchar_t * a6, const cchar_t * a7, const cchar_t * a8, const cchar_t * z)
+{
+	T((T_CALLED("wborder_set(%p,%p,%p,%p,%p,%p,%p,%p,%p)"), a1, a2, a3, a4, a5, a6, a7, a8, z)); returnCode(wborder_set(a1, a2, a3, a4, a5, a6, a7, a8, z));
+}
+
+
+extern int call_wecho_wchar (WINDOW * a1, const cchar_t * z);
+int call_wecho_wchar (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wecho_wchar(%p,%p)"), a1, z)); returnCode(wecho_wchar(a1, z));
+}
+
+
+extern int call_wget_wch (WINDOW * a1, wint_t * z);
+int call_wget_wch (WINDOW * a1, wint_t * z)
+{
+	T((T_CALLED("wget_wch(%p,%p)"), a1, z)); returnCode(wget_wch(a1, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_wget_wstr (WINDOW * a1, wint_t * z);
+int call_wget_wstr (WINDOW * a1, wint_t * z)
+{
+	T((T_CALLED("wget_wstr(%p,%p)"), a1, z)); returnCode(wget_wstr(a1, z));
+}
+#endif
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_wgetbkgrnd (WINDOW * a1, cchar_t * z);
+int call_wgetbkgrnd (WINDOW * a1, cchar_t * z)
+{
+	T((T_CALLED("wgetbkgrnd(%p,%p)"), a1, z)); returnCode(wgetbkgrnd(a1, z));
+}
+#endif
+
+
+extern int call_wgetn_wstr (WINDOW * a1, wint_t * a2, int z);
+int call_wgetn_wstr (WINDOW * a1, wint_t * a2, int z)
+{
+	T((T_CALLED("wgetn_wstr(%p,%p,%d)"), a1, a2, z)); returnCode(wgetn_wstr(a1, a2, z));
+}
+
+
+extern int call_whline_set (WINDOW * a1, const cchar_t * a2, int z);
+int call_whline_set (WINDOW * a1, const cchar_t * a2, int z)
+{
+	T((T_CALLED("whline_set(%p,%p,%d)"), a1, a2, z)); returnCode(whline_set(a1, a2, z));
+}
+
+
+extern int call_win_wch (WINDOW * a1, cchar_t * z);
+int call_win_wch (WINDOW * a1, cchar_t * z)
+{
+	T((T_CALLED("win_wch(%p,%p)"), a1, z)); returnCode(win_wch(a1, z));
+}
+
+
+extern int call_win_wchnstr (WINDOW * a1, cchar_t * a2, int z);
+int call_win_wchnstr (WINDOW * a1, cchar_t * a2, int z)
+{
+	T((T_CALLED("win_wchnstr(%p,%p,%d)"), a1, a2, z)); returnCode(win_wchnstr(a1, a2, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_win_wchstr (WINDOW * a1, cchar_t * z);
+int call_win_wchstr (WINDOW * a1, cchar_t * z)
+{
+	T((T_CALLED("win_wchstr(%p,%p)"), a1, z)); returnCode(win_wchstr(a1, z));
+}
+#endif
+
+
+extern int call_winnwstr (WINDOW * a1, wchar_t * a2, int z);
+int call_winnwstr (WINDOW * a1, wchar_t * a2, int z)
+{
+	return winnwstr(a1, a2, z) ;
+}
+
+
+extern int call_wins_nwstr (WINDOW * a1, const wchar_t * a2, int z);
+int call_wins_nwstr (WINDOW * a1, const wchar_t * a2, int z)
+{
+	T((T_CALLED("wins_nwstr(%p,%p,%d)"), a1, a2, z)); returnCode(wins_nwstr(a1, a2, z));
+}
+
+
+extern int call_wins_wch (WINDOW * a1, const cchar_t * z);
+int call_wins_wch (WINDOW * a1, const cchar_t * z)
+{
+	T((T_CALLED("wins_wch(%p,%p)"), a1, z)); returnCode(wins_wch(a1, z));
+}
+
+
+#if USE_WIDEC_SUPPORT
+extern int call_wins_wstr (WINDOW * a1, const wchar_t * z);
+int call_wins_wstr (WINDOW * a1, const wchar_t * z)
+{
+	T((T_CALLED("wins_wstr(%p,%p)"), a1, z)); returnCode(wins_wstr(a1, z));
+}
+#endif
+
+
+extern int call_winwstr (WINDOW * a1, wchar_t * z);
+int call_winwstr (WINDOW * a1, wchar_t * z)
+{
+	T((T_CALLED("winwstr(%p,%p)"), a1, z)); returnCode(winwstr(a1, z));
+}
+
+
+extern wchar_t * call_wunctrl (cchar_t * z);
+wchar_t * call_wunctrl (cchar_t * z)
+{
+	return wunctrl(z) ;
+}
+
+
+extern int call_wvline_set (WINDOW * a1, const cchar_t * a2, int z);
+int call_wvline_set (WINDOW * a1, const cchar_t * a2, int z)
+{
+	T((T_CALLED("wvline_set(%p,%p,%d)"), a1, a2, z)); returnCode(wvline_set(a1, a2, z));
 }
 
 
