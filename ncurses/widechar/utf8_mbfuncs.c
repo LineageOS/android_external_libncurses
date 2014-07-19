@@ -14,6 +14,9 @@
 #include <wchar.h>
 #include <stdlib.h>
 
+size_t u8_strnlen(const char *buf, size_t maxlen);
+size_t u8_strlen(const char *buf);
+
 static mbstate_t mbs = {0};
 
 int mblen(const char *s, size_t n)
@@ -38,13 +41,16 @@ int mblen(const char *s, size_t n)
 	return (buf_mb_len);
 }
 
+size_t mbrlen(const char *s, size_t n, mbstate_t *st)
+{
+	return (size_t) mblen(s,n);
+}
+
 /* mb char -> wchar (simple cast) */
 int mbtowc(wchar_t * __restrict__ wc, const char * __restrict__ src, size_t n)
 {
 	int len = mblen(src, n);
 	if (!wc) return 0;
-
-	//mbrtowc(wc, src, n, &mbs);
 
 	*wc = 0;
 	if (len > 0)
@@ -53,8 +59,13 @@ int mbtowc(wchar_t * __restrict__ wc, const char * __restrict__ src, size_t n)
 	return len;
 }
 
+size_t mbrtowc(wchar_t * wc, const char * src, size_t n, mbstate_t *st)
+{
+	return (int) mbtowc(wc, src, n);
+}
+
 /* wchar -> mb char (simple cast) */
-int wctomb(char * __restrict__ s, wchar_t wc)
+int wctomb(char * s, wchar_t wc)
 {
 	int len;
 	if (!s) return 0;
@@ -67,6 +78,78 @@ int wctomb(char * __restrict__ s, wchar_t wc)
 
 	len = mblen(s, 4);
 	return len;
+}
+
+size_t wcrtomb(char * s, wchar_t wc, mbstate_t *st)
+{
+	return (int) wctomb(s, wc);
+}
+
+size_t wcsrtombs(char *dst, const wchar_t **src, size_t len, mbstate_t *ps)
+{
+	size_t n, sz, cnt = 0;
+	char * dp;
+	const wchar_t *sp;
+
+	if (src == NULL)
+		return 0;
+
+	sp = *src;
+	if (dst == NULL) {
+		char tmp[8];
+		/* Count only */
+		while (cnt < len && *sp != 0) {
+			sz = wctomb(tmp, *sp); sp++;
+			cnt += sz;
+		}
+		return cnt;
+	}
+
+	n = len;
+	dp = dst;
+	while (n > 0) {
+		if (*sp == 0)
+			break;
+
+		sz = wctomb(dp, *sp); sp++;
+
+		dp += sz;
+		cnt += sz;
+		n--;
+	}
+	*dp = '\0';
+
+	return cnt;
+}
+
+size_t wcstombs(char *dst, const wchar_t *src, size_t len)
+{
+	return wcsrtombs(dst, &src, len, NULL);
+}
+
+size_t mbstowcs(wchar_t *dst, const char *src, size_t len)
+{
+	size_t sz, cnt = 0;
+	const char *sp = src;
+	wchar_t *dp = dst;
+
+	if (src == NULL)
+		return 0;
+
+	while (cnt < len && *sp != '\0') {
+		sz = mbtowc(dst, sp, MB_CUR_MAX);
+		dst++; cnt++;
+		sp += sz;
+	}
+
+	return cnt;
+}
+
+size_t mbsrtowcs(wchar_t *dst, const char **src, size_t len, mbstate_t *ps)
+{
+	if (src == NULL)
+		return 0;
+	return mbstowcs(dst, *src, len);
 }
 
 /* This function is equivalent to strlen() for utf-8 strings. */
