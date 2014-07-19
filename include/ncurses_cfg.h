@@ -48,14 +48,11 @@
 
 #define SYSTEM_NAME "eabi"
 #define CC_HAS_PROTOS 1
-#if 0
-void exit (int);
-#endif
 #define HAVE_LONG_FILE_NAMES 1
 #define MIXEDCASE_FILENAMES 1
 #define USE_DATABASE 1
-#define TERMINFO_DIRS "/usr/local/share/terminfo"
-#define TERMINFO "/usr/local/share/terminfo"
+#define TERMINFO_DIRS "/system/etc/terminfo"
+#define TERMINFO "/system/etc/terminfo"
 #define PURE_TERMINFO 1
 #define USE_HOME_TERMINFO 1
 #define USE_ROOT_ENVIRON 1
@@ -100,6 +97,7 @@ void exit (int);
 #define HAVE_FCNTL_H 1
 #define HAVE_GETOPT_H 1
 #define HAVE_LIMITS_H 1
+#define HAVE_LOCALE_H 1
 #define HAVE_POLL_H 1
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_PARAM_H 1
