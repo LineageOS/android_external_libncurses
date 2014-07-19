@@ -31,3 +31,13 @@ LOCAL_C_INCLUDES  := $(progs_include)
 LOCAL_SHARED_LIBRARIES := libncurses
 include $(BUILD_EXECUTABLE)
 
+include $(CLEAR_VARS)
+
+LOCAL_MODULE      := background
+LOCAL_MODULE_TAGS := debug
+LOCAL_SRC_FILES   := $(LOCAL_MODULE).c
+LOCAL_C_INCLUDES  := $(progs_include)
+LOCAL_SHARED_LIBRARIES := libncursesw
+LOCAL_CFLAGS += $(widec_flags)
+include $(BUILD_EXECUTABLE)
+
