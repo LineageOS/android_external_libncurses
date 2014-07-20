@@ -34,6 +34,15 @@
 #ifndef __TEST_PRIV_H
 #define __TEST_PRIV_H 1
 
+#ifdef USE_WIDECHAR
+#define HAVE_MBTOWC 1
+//#define HAVE_MBRTOWC 1
+#define HAVE_WCTOMB 1
+//#define HAVE_WCRTOMB 1
+#define HAVE_MBLEN 1
+//#define HAVE_MBRLEN 1
+#endif
+
 #include <ncurses_cfg.h>
 
 /*
@@ -374,6 +383,25 @@ extern int optind;
 #endif
 
 /*
+ * Workaround in case getcchar() returns a positive value when the source
+ * string produces only a L'\0'.
+ */
+#define TEST_CCHAR(s, count, then_stmt, else_stmt) \
+	if ((count = getcchar(s, NULL, NULL, NULL, NULL)) > 0) { \
+	    wchar_t test_wch[CCHARW_MAX + 2]; \
+	    attr_t test_attrs; \
+	    short test_pair; \
+	    \
+	    if (getcchar( s, test_wch, &test_attrs, &test_pair, NULL) == OK \
+		&& test_wch[0] != L'\0') { \
+		then_stmt \
+	    } else { \
+		else_stmt \
+	    } \
+	} else { \
+	    else_stmt \
+	}
+/*
  * These usually are implemented as macros, but may be functions.
  */
 #if !defined(getcurx) && !HAVE_GETCURX
@@ -571,6 +599,27 @@ typedef int (*NCURSES_SCREEN_CB)(SCREEN *, void *);
 #define Trace(p)		/* nothing */
 #define USE_TRACE 0
 #endif
+
+#define MvAddCh         (void) mvaddch
+#define MvWAddCh        (void) mvwaddch
+#define MvAddStr        (void) mvaddstr
+#define MvWAddStr       (void) mvwaddstr
+#define MvWAddChStr     (void) mvwaddchstr
+#define MvPrintw        (void) mvprintw
+#define MvWPrintw       (void) mvwprintw
+#define MvHLine         (void) mvhline
+#define MvWHLine        (void) mvwhline
+#define MvVLine         (void) mvvline
+#define MvWVLine        (void) mvwvline
+
+/*
+ * Workaround for defective implementation of gcc attribute warn_unused_result
+ */
+#if defined(__GNUC__) && defined(_FORTIFY_SOURCE)
+#define IGNORE_RC(func) errno = func
+#else
+#define IGNORE_RC(func) (void) func
+#endif /* gcc workarounds */
 
 #define init_mb(state)	memset(&state, 0, sizeof(state))
 
