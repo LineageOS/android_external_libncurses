@@ -97,8 +97,6 @@ extern "C" {
 extern int errno;
 #endif
 
-#include <nc_panel.h>
-
 /* Some systems have a broken 'select()', but workable 'poll()'.  Use that */
 #if HAVE_WORKING_POLL
 #define USE_FUNC_POLL 1
@@ -257,7 +255,45 @@ color_t;
 #define NCURSES_OPAQUE 0
 
 #include <curses.h>	/* we'll use -Ipath directive to get the right one! */
+
+/*
+ * If curses.h did not expose the SCREEN-functions, then we do not need the
+ * parameter in the corresponding unextended functions.
+ */
+
+#define SP_PARM         SP	/* use global variable */
+#define NCURSES_SP_ARG
+#define NCURSES_SP_DCL
+#define NCURSES_SP_DCL0 void
+#define NCURSES_SP_ARGx
+#define NCURSES_SP_DCLx
+
+#include <nc_panel.h>
+
+#define IsPreScreen(sp)      (((sp) != 0) && sp->_prescreen)
+#define HasTerminal(sp)      (((sp) != 0) && (0 != ((sp)->_term)))
+#define IsValidScreen(sp)    (HasTerminal(sp) && !IsPreScreen(sp))
+
+#if BROKEN_LINKER || USE_REENTRANT
+#define CurTerm              _nc_prescreen._cur_term
+#else
+#define CurTerm              cur_term
+#endif
+
+#define TerminalOf(sp)       CurTerm
+
 #include <term.h>
+
+/*
+ * Reduce dependency on cur_term global by using terminfo data from SCREEN's
+ * pointer to this data.
+ */
+#ifdef USE_SP_TERMTYPE
+#undef CUR
+#endif
+
+#define SP_TERMTYPE TerminalOf(sp)->type.
+
 #include <term_entry.h>
 #include <nc_tparm.h>
 
@@ -581,8 +617,10 @@ typedef struct {
  */
 #if MIXEDCASE_FILENAMES
 #define LEAF_FMT "%c"
+#define LEAF_LEN 1
 #else
 #define LEAF_FMT "%02x"
+#define LEAF_LEN 2
 #endif
 
 /*
@@ -1351,6 +1389,15 @@ extern NCURSES_EXPORT(const char *) _nc_viscbuf (const NCURSES_CH_T *, int);
 #endif /* TRACE/!TRACE */
 
 /*
+ * Workaround for defective implementation of gcc attribute warn_unused_result
+ */
+#if defined(__GNUC__) && defined(_FORTIFY_SOURCE)
+#define IGNORE_RC(func) errno = (int) func
+#else
+#define IGNORE_RC(func) (void) func
+#endif /* gcc workarounds */
+
+/*
  * Return-codes for tgetent() and friends.
  */
 #define TGETENT_YES  1		/* entry is found */
@@ -1733,6 +1780,14 @@ extern NCURSES_EXPORT(int) _nc_ripoffline (int line, int (*init)(WINDOW *,int));
  */
 #define MSG_NO_MEMORY "Out of memory"
 #define MSG_NO_INPUTS "Premature EOF"
+
+#define safe_keyname _nc_keyname
+#define safe_unctrl  _nc_unctrl
+#define safe_ungetch _nc_ungetch
+
+extern NCURSES_EXPORT(NCURSES_CONST char *) _nc_keyname (SCREEN *, int);
+extern NCURSES_EXPORT(int) _nc_ungetch (SCREEN *, int);
+extern NCURSES_EXPORT(NCURSES_CONST char *) _nc_unctrl (SCREEN *, chtype);
 
 #ifdef USE_WIDECHAR
 #include <ncursesw.h>

@@ -13,6 +13,7 @@ LOCAL_SHARED_LIBRARIES := libncursesw
 LOCAL_CFLAGS += $(widec_flags)
 include $(BUILD_EXECUTABLE)
 
+
 include $(CLEAR_VARS)
 
 LOCAL_MODULE      := test_instr
@@ -33,7 +34,17 @@ include $(BUILD_EXECUTABLE)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE      := background
+LOCAL_MODULE      := test_addwstr
+LOCAL_MODULE_TAGS := debug
+LOCAL_SRC_FILES   := $(LOCAL_MODULE).c
+LOCAL_C_INCLUDES  := $(progs_include)
+LOCAL_SHARED_LIBRARIES := libncursesw
+LOCAL_CFLAGS += $(widec_flags)
+include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE      := view
 LOCAL_MODULE_TAGS := debug
 LOCAL_SRC_FILES   := $(LOCAL_MODULE).c
 LOCAL_C_INCLUDES  := $(progs_include)
