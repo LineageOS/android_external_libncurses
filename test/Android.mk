@@ -37,7 +37,15 @@ LOCAL_SHARED_LIBRARIES := libncurses
 include $(BUILD_EXECUTABLE)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE      := test_addwstr
+LOCAL_MODULE      := test_addchstr
+LOCAL_MODULE_TAGS := debug
+LOCAL_SRC_FILES   := $(LOCAL_MODULE).c
+LOCAL_C_INCLUDES  := $(progs_include)
+LOCAL_SHARED_LIBRARIES := libncurses
+include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE      := test_add_wchstr
 LOCAL_MODULE_TAGS := debug
 LOCAL_SRC_FILES   := $(LOCAL_MODULE).c
 LOCAL_C_INCLUDES  := $(progs_include)
