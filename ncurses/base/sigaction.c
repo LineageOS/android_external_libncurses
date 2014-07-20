@@ -32,10 +32,20 @@
  *     and: Thomas E. Dickey                        1996-2003               *
  ****************************************************************************/
 
+#include <curses.priv.h>
+
 /* This file provides sigaction() emulation using sigvec() */
 /* Use only if this is non POSIX system */
 
 MODULE_ID("$Id: sigaction.c,v 1.14 2003/12/07 01:06:52 tom Exp $")
+
+#ifdef __BIONIC__
+#include <signal.h>
+typedef struct sigvec sigaction_t;
+extern int sigsetmask(int mask);
+extern int sigvec(int, struct sigvec *, struct sigvec*);
+#define sigmask(sig) (1UL << ((sig) - 1))
+#endif
 
 static int
 _nc_sigaction(int sig, sigaction_t * sigact, sigaction_t * osigact)

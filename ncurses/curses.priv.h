@@ -97,8 +97,6 @@ extern "C" {
 extern int errno;
 #endif
 
-#include <nc_panel.h>
-
 /* Some systems have a broken 'select()', but workable 'poll()'.  Use that */
 #if HAVE_WORKING_POLL
 #define USE_FUNC_POLL 1
@@ -257,10 +255,66 @@ color_t;
 #define NCURSES_OPAQUE 0
 
 #include <curses.h>	/* we'll use -Ipath directive to get the right one! */
+
+/*
+ * If curses.h did not expose the SCREEN-functions, then we do not need the
+ * parameter in the corresponding unextended functions.
+ */
+
+#define SP_PARM         SP	/* use global variable */
+#define NCURSES_SP_ARG
+#define NCURSES_SP_DCL
+#define NCURSES_SP_DCL0 void
+#define NCURSES_SP_ARGx
+#define NCURSES_SP_DCLx
+
+#include <nc_panel.h>
+
+#define IsPreScreen(sp)      (((sp) != 0) && sp->_prescreen)
+#define HasTerminal(sp)      (((sp) != 0) && (0 != ((sp)->_term)))
+#define IsValidScreen(sp)    (HasTerminal(sp) && !IsPreScreen(sp))
+
+#if BROKEN_LINKER || USE_REENTRANT
+#define CurTerm              _nc_prescreen._cur_term
+#else
+#define CurTerm              cur_term
+#endif
+
+#define TerminalOf(sp)       CurTerm
+
 #include <term.h>
+
+/*
+ * Reduce dependency on cur_term global by using terminfo data from SCREEN's
+ * pointer to this data.
+ */
+#ifdef USE_SP_TERMTYPE
+#undef CUR
+#endif
+
+#define SP_TERMTYPE TerminalOf(sp)->type.
+
 #include <term_entry.h>
 #include <nc_tparm.h>
 
+/*
+ * Use these macros internally, to make tracing less verbose.  But leave the
+ * option for compiling the tracing into the library.
+ */
+#if 1
+#define ColorPair(n)		NCURSES_BITS(n, 0)
+#define PairNumber(a)		(NCURSES_CAST(int,(((unsigned long)(a) & A_COLOR) >> NCURSES_ATTR_SHIFT)))
+#else
+#define ColorPair(pair)		COLOR_PAIR(pair)
+#define PairNumber(attr)	PAIR_NUMBER(attr)
+#endif
+
+/*
+ * Extended-colors stores the color pair in a separate struct-member than the
+ * attributes.  But for compatibility, we handle most cases where a program
+ * written for non-extended colors stores the color in the attributes by
+ * checking for a color pair in both places.
+ */
 #if NCURSES_EXT_COLORS && USE_WIDEC_SUPPORT
 #define if_EXT_COLORS(stmt)	stmt
 #define NetPair(value,p)	(value).ext_color = (p), \
@@ -563,8 +617,10 @@ typedef struct {
  */
 #if MIXEDCASE_FILENAMES
 #define LEAF_FMT "%c"
+#define LEAF_LEN 1
 #else
 #define LEAF_FMT "%02x"
+#define LEAF_LEN 2
 #endif
 
 /*
@@ -1331,6 +1387,15 @@ extern NCURSES_EXPORT(const char *) _nc_viscbuf (const NCURSES_CH_T *, int);
 #define returnWin(code)		return code
 
 #endif /* TRACE/!TRACE */
+
+/*
+ * Workaround for defective implementation of gcc attribute warn_unused_result
+ */
+#if defined(__GNUC__) && defined(_FORTIFY_SOURCE)
+#define IGNORE_RC(func) errno = (int) func
+#else
+#define IGNORE_RC(func) (void) func
+#endif /* gcc workarounds */
 
 /*
  * Return-codes for tgetent() and friends.
