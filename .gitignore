@@ -1,0 +1,12 @@
+headers.sh
+man/adacursesw-config.1
+man/ncursesw6-config.1
+
+obj_g/
+objects/
+lib/
+
+ncurses/make_keys
+ncurses/make_hash
+
+config.log
