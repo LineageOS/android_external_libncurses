@@ -4,7 +4,6 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-c-files-under, ncurses/tty)
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/base)
-LOCAL_SRC_FILES := $(filter-out ncurses/base/sigaction.c, $(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/tinfo)
 LOCAL_SRC_FILES := $(filter-out ncurses/tinfo/make_keys.c, $(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/widechar)
@@ -47,7 +46,6 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-c-files-under, ncurses/tty) 
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/base) 
-LOCAL_SRC_FILES := $(filter-out ncurses/base/sigaction.c, $(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES += $(call all-c-files-under, ncurses/tinfo) 
 LOCAL_SRC_FILES := $(filter-out ncurses/tinfo/make_keys.c, $(LOCAL_SRC_FILES))
 

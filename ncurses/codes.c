@@ -7,8 +7,6 @@
 
 #if BROKEN_LINKER || USE_REENTRANT
 
-#include <term.h>
-
 static const char _nc_code_blob[] = 
 "bw\0" "am\0" "xb\0" "xs\0" "xn\0" "eo\0" "gn\0" "hc\0" "km\0" "hs\0" "in\0" \
 "da\0" "db\0" "mi\0" "ms\0" "os\0" "es\0" "xt\0" "hz\0" "ul\0" "xo\0" "nx\0" \
@@ -121,20 +119,31 @@ alloc_array(NCURSES_CONST char ***value, const short *offsets, unsigned size)
 		if ((*value = typeCalloc(NCURSES_CONST char *, size + 1)) != 0) {
 			unsigned n;
 			for (n = 0; n < size; ++n) {
-				(*value)[n] = _nc_code_blob + offsets[n];
+				(*value)[n] = (NCURSES_CONST char *) _nc_code_blob + offsets[n];
 			}
 		}
 	}
 	return *value;
 }
 
-#define FIX(it) NCURSES_IMPEXP IT * NCURSES_API _nc_##it(void) { return alloc_array(&ptr_##it, _nc_offset_##it, SIZEOF(_nc_offset_##it)); }
+#define FIX(it) NCURSES_IMPEXP IT * NCURSES_API NCURSES_PUBLIC_VAR(it)(void) { return alloc_array(&ptr_##it, _nc_offset_##it, SIZEOF(_nc_offset_##it)); }
 
+/* remove public definition which conflicts with FIX() */
+#undef boolcodes
+#undef numcodes
+#undef strcodes
+
+/* add local definition */
 FIX(boolcodes)
 FIX(numcodes)
 FIX(strcodes)
 
+/* restore the public definition */
+
 #define FREE_FIX(it) if (ptr_##it) { FreeAndNull(ptr_##it); }
+#define boolcodes  NCURSES_PUBLIC_VAR(boolcodes())
+#define numcodes   NCURSES_PUBLIC_VAR(numcodes())
+#define strcodes   NCURSES_PUBLIC_VAR(strcodes())
 
 #if NO_LEAKS
 NCURSES_EXPORT(void)
