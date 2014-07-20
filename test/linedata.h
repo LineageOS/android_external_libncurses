@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2002-2004,2009 Free Software Foundation, Inc.              *
+ * Copyright (c) 2009,2010 Free Software Foundation, Inc.                   *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -26,75 +26,75 @@
  * authorization.                                                           *
  ****************************************************************************/
 
-/****************************************************************************
- * Author: Thomas Dickey                                                    *
- ****************************************************************************/
+#define isQUIT(c)     ((c) == QUIT || (c) == ESCAPE)
 
-/*
-**	lib_inwstr.c
-**
-**	The routines winnwstr() and winwstr().
-**
-*/
+#define key_RECUR     CTRL('W')
+#define key_NEWLINE   CTRL('N')
+#define key_BACKSPACE '\b'
 
-#include <curses.priv.h>
+static FILE *linedata;
 
-MODULE_ID("$Id: lib_inwstr.c,v 1.5 2009/10/24 22:37:29 tom Exp $")
-
-NCURSES_EXPORT(int)
-winnwstr(WINDOW *win, wchar_t *wstr, int n)
+static void
+failed(const char *s)
 {
-    int row, col, inx;
-    int count = 0;
-    int last = 0;
-    cchar_t *text;
-    wchar_t wch;
-
-    T((T_CALLED("winnwstr(%p,%p,%d)"), (void *) win, (void *) wstr, n));
-    if (wstr != 0) {
-	if (win) {
-	    getyx(win, row, col);
-
-	    text = win->_line[row].text;
-	    while (count < n && count != ERR) {
-		if (!isWidecExt(text[col])) {
-		    for (inx = 0; (inx < CCHARW_MAX)
-			 && ((wch = text[col].chars[inx]) != 0);
-			 ++inx) {
-			if (count + 1 > n) {
-			    if ((count = last) == 0) {
-				count = ERR;	/* error if we store nothing */
-			    }
-			    break;
-			}
-			wstr[count++] = wch;
-		    }
-		}
-		last = count;
-		if (++col > win->_maxx) {
-		    break;
-		}
-	    }
-	}
-	if (count > 0) {
-	    wstr[count] = '\0';
-	    T(("winnwstr returns %s", _nc_viswbuf(wstr)));
-	}
-    }
-    returnCode(count);
+    perror(s);
+    ExitProgram(EXIT_FAILURE);
 }
 
-/*
- * X/Open says winwstr() returns OK if not ERR.  If that is not a blunder, it
- * must have a null termination on the string (see above).  Unlike winnstr(),
- * it does not define what happens for a negative count with winnwstr().
- */
-NCURSES_EXPORT(int)
-winwstr(WINDOW *win, wchar_t *wstr)
+static void
+init_linedata(const char *name)
 {
-    int result = OK;
-    T((T_CALLED("winwstr(%p,%p)"), (void *) win, (void *) wstr));
-    if (winnwstr(win, wstr, CCHARW_MAX * (win->_maxx - win->_curx + 1)) == ERR)
+    if ((linedata = fopen(name, "r")) == 0) {
+	failed(name);
+    }
+}
+
+static int
+read_linedata(WINDOW *work)
+{
+    int result;
+    if (linedata != 0) {
+	result = fgetc(linedata);
+	if (result == EOF) {
+	    fclose(linedata);
+	    linedata = 0;
+	    result = read_linedata(work);
+	} else {
+	    wrefresh(work);
+	    if (result == '\n') {
+		result = key_NEWLINE;
+	    }
+	}
+    } else {
+#ifdef WIDE_LINEDATA
+	wint_t ch;
+	int code;
+
 	result = ERR;
-    returnCode(result);
+	while ((code = wget_wch(work, &ch)) != ERR) {
+
+	    if (code == KEY_CODE_YES) {
+		switch (ch) {
+		case KEY_DOWN:
+		    result = key_NEWLINE;
+		    break;
+		case KEY_BACKSPACE:
+		    result = key_BACKSPACE;
+		    break;
+		default:
+		    beep();
+		    continue;
+		}
+	    } else if (code != ERR) {
+		result = (int) ch;
+		break;
+	    } else {
+		break;
+	    }
+	}
+#else
+	result = wgetch(work);
+#endif
+    }
+    return result;
 }
