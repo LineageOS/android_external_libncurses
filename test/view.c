@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 1998-2007,2008 Free Software Foundation, Inc.              *
+ * Copyright (c) 1998-2009,2010 Free Software Foundation, Inc.              *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -50,7 +50,7 @@
  * scroll operation worked, and the refresh() code only had to do a
  * partial repaint.
  *
- * $Id: view.c,v 1.69 2008/09/06 22:10:50 tom Exp $
+ * $Id: view.c,v 1.81 2010/11/14 01:06:02 tom Exp $
  */
 
 #include <test.priv.h>
@@ -62,7 +62,9 @@
 #if HAVE_TERMIOS_H
 # include <termios.h>
 #else
+#if !defined(__MINGW32__)
 # include <sgtty.h>
+#endif
 #endif
 
 #if !defined(sun) || !HAVE_TERMIOS_H
@@ -81,7 +83,7 @@
 
 #if USE_WIDEC_SUPPORT
 #if HAVE_MBTOWC && HAVE_MBLEN
-#define reset_mbytes(state) mblen(NULL, 0), mbtowc(NULL, NULL, 0)
+#define reset_mbytes(state) IGNORE_RC(mblen(NULL, 0)), IGNORE_RC(mbtowc(NULL, NULL, 0))
 #define count_mbytes(buffer,length,state) mblen(buffer,length)
 #define check_mbytes(wch,buffer,length,state) \
 	(int) mbtowc(&wch, buffer, length)
@@ -149,11 +151,19 @@ ch_len(NCURSES_CH_T * src)
 {
     int result = 0;
 #if USE_WIDEC_SUPPORT
+    int count;
 #endif
 
 #if USE_WIDEC_SUPPORT
-    while (getcchar(src++, NULL, NULL, NULL, NULL) > 0)
-	result++;
+    for (;;) {
+	TEST_CCHAR(src, count, {
+	    ++result;
+	    ++src;
+	}
+	, {
+	    break;
+	})
+    }
 #else
     while (*src++)
 	result++;
@@ -168,7 +178,7 @@ ch_len(NCURSES_CH_T * src)
 static NCURSES_CH_T *
 ch_dup(char *src)
 {
-    unsigned len = strlen(src);
+    unsigned len = (unsigned) strlen(src);
     NCURSES_CH_T *dst = typeMalloc(NCURSES_CH_T, len + 1);
     unsigned j, k;
 #if USE_WIDEC_SUPPORT
@@ -187,7 +197,7 @@ ch_dup(char *src)
 #endif
     for (j = k = 0; j < len; j++) {
 #if USE_WIDEC_SUPPORT
-	rc = check_mbytes(wch, src + j, len - j, state);
+	rc = (size_t) check_mbytes(wch, src + j, len - j, state);
 	if (rc == (size_t) -1 || rc == (size_t) -2)
 	    break;
 	j += rc - 1;
@@ -204,7 +214,7 @@ ch_dup(char *src)
 	    wstr[l++] = L' ';
 	wstr[l++] = wch;
 #else
-	dst[k++] = src[j];
+	dst[k++] = (chtype) UChar(src[j]);
 #endif
     }
 #if USE_WIDEC_SUPPORT
@@ -281,8 +291,10 @@ main(int argc, char *argv[])
     if (optind + 1 != argc)
 	usage();
 
-    if ((vec_lines = typeMalloc(NCURSES_CH_T *, MAXLINES + 2)) == 0)
+    if ((vec_lines = typeCalloc(NCURSES_CH_T *, (size_t) MAXLINES + 2)) == 0)
 	usage();
+
+    assert(vec_lines != 0);
 
     fname = argv[optind];
     if ((fp = fopen(fname, "r")) == 0) {
@@ -321,14 +333,14 @@ main(int argc, char *argv[])
 	    } else {
 		sprintf(d, "\\%03o", UChar(*s));
 		d += strlen(d);
-		col = (d - temp);
+		col = (int) (d - temp);
 	    }
 #endif
 	}
 	*lptr = ch_dup(temp);
     }
     (void) fclose(fp);
-    num_lines = lptr - vec_lines;
+    num_lines = (int) (lptr - vec_lines);
 
     (void) initscr();		/* initialize the curses library */
     keypad(stdscr, TRUE);	/* enable keyboard mapping */
@@ -355,7 +367,6 @@ main(int argc, char *argv[])
 	if (!got_number)
 	    show_all(my_label);
 
-	n = 0;
 	for (;;) {
 #if CAN_RESIZE
 	    if (interrupted) {
@@ -368,7 +379,7 @@ main(int argc, char *argv[])
 	    waiting = FALSE;
 	    if ((c < 127) && isdigit(c)) {
 		if (!got_number) {
-		    mvprintw(0, 0, "Count: ");
+		    MvPrintw(0, 0, "Count: ");
 		    clrtoeol();
 		}
 		addch(UChar(c));
@@ -394,7 +405,7 @@ main(int argc, char *argv[])
 		    lptr++;
 		else
 		    break;
-	    scrl(lptr - olptr);
+	    scrl((int) (lptr - olptr));
 	    break;
 
 	case KEY_UP:
@@ -405,7 +416,7 @@ main(int argc, char *argv[])
 		    lptr--;
 		else
 		    break;
-	    scrl(lptr - olptr);
+	    scrl((int) (lptr - olptr));
 	    break;
 
 	case 'h':
@@ -490,12 +501,11 @@ finish(int sig)
 
 #if CAN_RESIZE
 /*
- * This uses functions that are "unsafe", but it seems to work on SunOS and
- * Linux.  Usually:  the "unsafe" refers to the functions that POSIX lists
- * which may be called from a signal handler.  Those do not include buffered
- * I/O, which is used for instance in wrefresh().  To be really portable, you
- * should use the KEY_RESIZE return (which relies on ncurses' sigwinch
- * handler).
+ * This uses functions that are "unsafe", but it seems to work on SunOS. 
+ * Usually: the "unsafe" refers to the functions that POSIX lists which may be
+ * called from a signal handler.  Those do not include buffered I/O, which is
+ * used for instance in wrefresh().  To be really portable, you should use the
+ * KEY_RESIZE return (which relies on ncurses' sigwinch handler).
  *
  * The 'wrefresh(curscr)' is needed to force the refresh to start from the top
  * of the screen -- some xterms mangle the bitmap while resizing.
@@ -508,7 +518,7 @@ adjust(int sig)
 
 	if (ioctl(fileno(stdout), TIOCGWINSZ, &size) == 0) {
 	    resize_term(size.ws_row, size.ws_col);
-	    wrefresh(curscr);	/* Linux needs this */
+	    wrefresh(curscr);
 	    show_all(sig ? "SIGWINCH" : "interrupt");
 	}
 	interrupted = FALSE;
@@ -529,9 +539,12 @@ show_all(const char *tag)
 
 #if CAN_RESIZE
     sprintf(temp, "%.20s (%3dx%3d) col %d ", tag, LINES, COLS, shift);
-    i = strlen(temp);
-    if ((i + 7) < (int) sizeof(temp))
-	sprintf(temp + i, "view %.*s", (int) (sizeof(temp) - 7 - i), fname);
+    i = (int) strlen(temp);
+    if ((i + 7) < (int) sizeof(temp)) {
+	sprintf(temp + i, "view %.*s",
+		(int) (sizeof(temp) - 7 - (size_t) i),
+		fname);
+    }
 #else
     (void) tag;
     sprintf(temp, "view %.*s", (int) sizeof(temp) - 7, fname);
@@ -541,7 +554,7 @@ show_all(const char *tag)
     clrtoeol();
     this_time = time((time_t *) 0);
     strcpy(temp, ctime(&this_time));
-    if ((i = strlen(temp)) != 0) {
+    if ((i = (int) strlen(temp)) != 0) {
 	temp[--i] = 0;
 	if (move(0, COLS - i - 2) != ERR)
 	    printw("  %s", temp);
