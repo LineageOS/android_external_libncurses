@@ -28,7 +28,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH) \
 		$(LOCAL_PATH)/include \
 		$(LOCAL_PATH)/ncurses \
 
-LOCAL_MODULE_TAGS := eng
+LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libncurses
 
 include $(BUILD_SHARED_LIBRARY)
