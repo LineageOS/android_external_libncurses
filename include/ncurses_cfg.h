@@ -59,8 +59,8 @@
 #endif
 #define HAVE_LONG_FILE_NAMES 1
 #define MIXEDCASE_FILENAMES 1
-#define TERMINFO_DIRS "/system/etc/terminfo"
-#define TERMINFO "/system/etc/terminfo"
+#define TERMINFO_DIRS "/product/etc/terminfo"
+#define TERMINFO "/product/etc/terminfo"
 #define HAVE_BIG_CORE 1
 #define PURE_TERMINFO 1
 #define USE_HOME_TERMINFO 1
