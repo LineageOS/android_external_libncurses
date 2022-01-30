@@ -161,6 +161,7 @@ prebuilt_etc {
     filename: "ansi",
     relative_install_path: "terminfo/a",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -169,6 +170,7 @@ prebuilt_etc {
     filename: "cons25",
     relative_install_path: "terminfo/c",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -177,6 +179,7 @@ prebuilt_etc {
     filename: "cons25-debian",
     relative_install_path: "terminfo/c",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -185,6 +188,7 @@ prebuilt_etc {
     filename: "cygwin",
     relative_install_path: "terminfo/c",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -193,6 +197,7 @@ prebuilt_etc {
     filename: "dumb",
     relative_install_path: "terminfo/d",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -201,6 +206,7 @@ prebuilt_etc {
     filename: "hurd",
     relative_install_path: "terminfo/h",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -209,6 +215,7 @@ prebuilt_etc {
     filename: "linux",
     relative_install_path: "terminfo/l",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -217,6 +224,7 @@ prebuilt_etc {
     filename: "mach",
     relative_install_path: "terminfo/m",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -225,6 +233,7 @@ prebuilt_etc {
     filename: "mach-bold",
     relative_install_path: "terminfo/m",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -233,6 +242,7 @@ prebuilt_etc {
     filename: "mach-color",
     relative_install_path: "terminfo/m",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -241,6 +251,7 @@ prebuilt_etc {
     filename: "mach-gnu",
     relative_install_path: "terminfo/m",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -249,6 +260,7 @@ prebuilt_etc {
     filename: "mach-gnu-color",
     relative_install_path: "terminfo/m",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -257,6 +269,7 @@ prebuilt_etc {
     filename: "pcansi",
     relative_install_path: "terminfo/p",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -265,6 +278,7 @@ prebuilt_etc {
     filename: "rxvt",
     relative_install_path: "terminfo/r",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -273,6 +287,7 @@ prebuilt_etc {
     filename: "rxvt-basic",
     relative_install_path: "terminfo/r",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -281,6 +296,7 @@ prebuilt_etc {
     filename: "screen",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -289,6 +305,7 @@ prebuilt_etc {
     filename: "screen-256color",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -297,6 +314,7 @@ prebuilt_etc {
     filename: "screen-256color-bce",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -305,6 +323,7 @@ prebuilt_etc {
     filename: "screen-bce",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -313,6 +332,7 @@ prebuilt_etc {
     filename: "screen-s",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -321,6 +341,7 @@ prebuilt_etc {
     filename: "screen-w",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -329,6 +350,7 @@ prebuilt_etc {
     filename: "screen.xterm-256color",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -337,6 +359,7 @@ prebuilt_etc {
     filename: "sun",
     relative_install_path: "terminfo/s",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -345,6 +368,7 @@ prebuilt_etc {
     filename: "tmux",
     relative_install_path: "terminfo/t",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -353,6 +377,7 @@ prebuilt_etc {
     filename: "tmux-256color",
     relative_install_path: "terminfo/t",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -361,6 +386,7 @@ prebuilt_etc {
     filename: "vt100",
     relative_install_path: "terminfo/v",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -369,6 +395,7 @@ prebuilt_etc {
     filename: "vt102",
     relative_install_path: "terminfo/v",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -377,6 +404,7 @@ prebuilt_etc {
     filename: "vt220",
     relative_install_path: "terminfo/v",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -385,6 +413,7 @@ prebuilt_etc {
     filename: "vt52",
     relative_install_path: "terminfo/v",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -393,6 +422,7 @@ prebuilt_etc {
     filename: "wsvt25",
     relative_install_path: "terminfo/w",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -401,6 +431,7 @@ prebuilt_etc {
     filename: "wsvt25m",
     relative_install_path: "terminfo/w",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -409,6 +440,7 @@ prebuilt_etc {
     filename: "xterm",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -417,6 +449,7 @@ prebuilt_etc {
     filename: "xterm-256color",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -425,6 +458,7 @@ prebuilt_etc {
     filename: "xterm-color",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -433,6 +467,7 @@ prebuilt_etc {
     filename: "xterm-mono",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -441,6 +476,7 @@ prebuilt_etc {
     filename: "xterm-r5",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -449,6 +485,7 @@ prebuilt_etc {
     filename: "xterm-r6",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -457,6 +494,7 @@ prebuilt_etc {
     filename: "xterm-vt220",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -465,6 +503,7 @@ prebuilt_etc {
     filename: "xterm-xfree86",
     relative_install_path: "terminfo/x",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -473,6 +512,7 @@ prebuilt_etc {
     filename: "Eterm",
     relative_install_path: "terminfo/E",
     product_specific: true,
+    recovery_available: true,
 }
 
 prebuilt_etc {
@@ -481,6 +521,7 @@ prebuilt_etc {
     filename: "Eterm-color",
     relative_install_path: "terminfo/E",
     product_specific: true,
+    recovery_available: true,
 }
 
 cc_defaults {

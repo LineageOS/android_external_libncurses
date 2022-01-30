@@ -78,6 +78,7 @@ for file in ${TERMINFO_FILES}; do
     filename: "\"$(basename ${file})\"",
     relative_install_path: \"terminfo/$(dirname "${file}")\",
     product_specific: true,
+    recovery_available: true,
 }
 " >> ${OUT}
 done

@@ -19,4 +19,5 @@ cc_library_shared {
         "ncurses",
     ],
     product_specific: true,
+    recovery_available: true,
 }
