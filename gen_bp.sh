@@ -78,6 +78,7 @@ for file in ${TERMINFO_FILES}; do
     filename: "\"$(basename ${file})\"",
     relative_install_path: \"terminfo/$(dirname "${file}")\",
     product_specific: true,
+    recovery_available: true,
 }
 " >> ${OUT}
 done
@@ -90,6 +91,22 @@ EOF
 
 for module in "${REQUIRED_MODULE_NAMES[@]}"; do
     echo "        \"${module}\"," >> ${OUT}
+done
+
+cat << EOF >> ${OUT}
+    ],
+}
+
+EOF
+
+cat << EOF >> ${OUT}
+cc_defaults {
+    name: "libncurses_etc_files_recovery",
+    required: [
+EOF
+
+for module in "${REQUIRED_MODULE_NAMES[@]}"; do
+    echo "        \"${module}.recovery\"," >> ${OUT}
 done
 
 cat << EOF >> ${OUT}

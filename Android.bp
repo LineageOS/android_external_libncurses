@@ -1,8 +1,8 @@
 build = ["Android.sources.bp"]
 
-cc_library_shared {
-    name: "libncurses",
-    defaults: ["libncurses_etc_files"],
+cc_defaults {
+    name: "libncurses_defaults",
+    stem: "libncurses",
     srcs: [":libncurses_sources"],
     cflags: [
         "-DHAVE_CONFIG_H",
@@ -18,5 +18,22 @@ cc_library_shared {
         "include",
         "ncurses",
     ],
+}
+
+cc_library_shared {
+    name: "libncurses",
+    defaults: [
+        "libncurses_defaults",
+        "libncurses_etc_files",
+    ],
     product_specific: true,
+}
+
+cc_library_shared {
+    name: "libncurses_recovery",
+    defaults: [
+        "libncurses_defaults",
+        "libncurses_etc_files_recovery",
+    ],
+    recovery: true,
 }
