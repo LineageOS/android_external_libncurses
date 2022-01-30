@@ -1,0 +1,22 @@
+build = ["Android.sources.bp"]
+
+cc_library_shared {
+    name: "libncurses",
+    defaults: ["libncurses_etc_files"],
+    srcs: [":libncurses_sources"],
+    cflags: [
+        "-DHAVE_CONFIG_H",
+        "-U_XOPEN_SOURCE",
+        "-D_XOPEN_SOURCE=500",
+        "-U_POSIX_C_SOURCE",
+        "-D_POSIX_C_SOURCE=199506L",
+        "-DNDEBUG",
+        "-Wno-unused-parameter",
+    ],
+    export_include_dirs: [
+        ".",
+        "include",
+        "ncurses",
+    ],
+    system_ext_specific: true,
+}
