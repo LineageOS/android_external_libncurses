@@ -47,7 +47,7 @@ include $(BUILD_SHARED_LIBRARY)
 
 # Copy only basic terminal type definitions as ncurses-base in debian does by default.
 # https://salsa.debian.org/debian/ncurses/-/blob/master/debian/rules#L179
-TERMINFO_FILES := \
+terminfo_files := \
 	a/ansi c/cons25 c/cons25-debian c/cygwin d/dumb h/hurd l/linux \
 	m/mach m/mach-bold m/mach-color m/mach-gnu m/mach-gnu-color p/pcansi \
 	r/rxvt r/rxvt-basic \
@@ -60,11 +60,14 @@ TERMINFO_FILES := \
 
 TERMINFO_SOURCE := $(LOCAL_PATH)/lib/terminfo
 TERMINFO_TARGET := $(TARGET_OUT_SYSTEM_EXT_ETC)/terminfo
-$(TERMINFO_TARGET): $(ACP)
-	@echo "copy terminfo to /etc/"
-	@mkdir -p $@
-	@$(foreach TERMINFO_FILE,$(TERMINFO_FILES), \
-		mkdir -p $@/$(dir $(TERMINFO_FILE)); \
-		$(ACP) $(TERMINFO_SOURCE)/$(TERMINFO_FILE) $@/$(TERMINFO_FILE); \
-	)
-ALL_DEFAULT_INSTALLED_MODULES += $(TERMINFO_TARGET)
+TERMINFO_MODULES := $(addprefix $(TERMINFO_TARGET)/, $(terminfo_files))
+$(TERMINFO_MODULES): $(TERMINFO_TARGET)/%: $(TERMINFO_SOURCE)/% | $(LOCAL_BUILT_MODULE)
+	@echo "Install: $@"
+	@mkdir -p $(dir $@)
+	$(hide) cp $< $@
+
+ALL_DEFAULT_INSTALLED_MODULES += $(TERMINFO_MODULES)
+
+ALL_MODULES.$(LOCAL_MODULE).INSTALLED := \
+  $(ALL_MODULES.$(LOCAL_MODULE).INSTALLED) \
+  $(TERMINFO_MODULES)
