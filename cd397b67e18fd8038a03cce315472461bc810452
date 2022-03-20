@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20110ea8_12d4c9f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2022-03-20T15:33:15Z",
+      "side": 1,
+      "message": "https://review.lineageos.org/c/LineageOS/android_external_libncurses/+/327064\nIn case this doesn\u0027t go through, but we better do something like that",
+      "revId": "cd397b67e18fd8038a03cce315472461bc810452",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
