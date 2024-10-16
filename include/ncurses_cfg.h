@@ -70,8 +70,13 @@
 #define HAVE_STDINT_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_DIRENT_H 1
+#if defined(__ANDROID_RECOVERY__)
+#define TERMINFO_DIRS "/system/etc/terminfo"
+#define TERMINFO "/system/etc/terminfo"
+#else
 #define TERMINFO_DIRS "/system_ext/etc/terminfo"
 #define TERMINFO "/system_ext/etc/terminfo"
+#endif
 #define HAVE_BIG_CORE 1
 #define PURE_TERMINFO 1
 #define USE_HOME_TERMINFO 1
