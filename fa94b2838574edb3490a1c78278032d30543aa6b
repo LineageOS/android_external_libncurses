@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ce7a92_f3ec1bf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32245
+      },
+      "writtenOn": "2024-10-16T17:55:19Z",
+      "side": 1,
+      "message": "wait lemme keep only xterm-256color to lower space usage",
+      "revId": "fa94b2838574edb3490a1c78278032d30543aa6b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
