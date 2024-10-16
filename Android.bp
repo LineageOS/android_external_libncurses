@@ -96,8 +96,15 @@ prebuilt_etc {
     system_ext_specific: true,
 }
 
-cc_library {
-    name: "libncurses",
+prebuilt_etc {
+    name: "libncurses-terminfo-x-xterm_recovery",
+    srcs: ["lib/terminfo/x/xterm*"],
+    sub_dir: "terminfo/x",
+    recovery: true,
+}
+
+cc_defaults {
+    name: "libncurses_defaults",
     srcs: [
         "ncurses/base/define_key.c",
         "ncurses/base/key_defined.c",
@@ -264,6 +271,11 @@ cc_library {
     local_include_dirs: [
         "ncurses",
     ],
+}
+
+cc_library {
+    name: "libncurses",
+    defaults: ["libncurses_defaults"],
     required: [
         "libncurses-terminfo-a",
         "libncurses-terminfo-c",
@@ -281,4 +293,13 @@ cc_library {
         "libncurses-terminfo-x",
     ],
     system_ext_specific: true,
+}
+
+cc_library {
+    name: "libncurses_recovery",
+    defaults: ["libncurses_defaults"],
+    required: [
+        "libncurses-terminfo-x-xterm_recovery",
+    ],
+    recovery: true,
 }
