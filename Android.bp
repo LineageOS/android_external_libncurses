@@ -1,103 +1,305 @@
+filegroup {
+    name: "libncurses-terminfo-a_filegroup",
+    srcs: ["lib/terminfo/a/*"],
+    system_ext_specific: true,
+}
+
 prebuilt_etc {
     name: "libncurses-terminfo-a",
-    srcs: ["lib/terminfo/a/*"],
+    srcs: [":libncurses-terminfo-a_filegroup"],
     sub_dir: "terminfo/a",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-c",
+    name: "libncurses-terminfo-a_recovery",
+    srcs: [":libncurses-terminfo-a_filegroup"],
+    sub_dir: "terminfo/a",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-c_filegroup",
     srcs: ["lib/terminfo/c/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-c",
+    srcs: [":libncurses-terminfo-c_filegroup"],
     sub_dir: "terminfo/c",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-d",
+    name: "libncurses-terminfo-c_recovery",
+    srcs: [":libncurses-terminfo-c_filegroup"],
+    sub_dir: "terminfo/c",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-d_filegroup",
     srcs: ["lib/terminfo/d/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-d",
+    srcs: [":libncurses-terminfo-d_filegroup"],
     sub_dir: "terminfo/d",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-E",
+    name: "libncurses-terminfo-d_recovery",
+    srcs: [":libncurses-terminfo-d_filegroup"],
+    sub_dir: "terminfo/d",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-E_filegroup",
     srcs: ["lib/terminfo/E/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-E",
+    srcs: [":libncurses-terminfo-E_filegroup"],
     sub_dir: "terminfo/E",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-h",
+    name: "libncurses-terminfo-E_recovery",
+    srcs: [":libncurses-terminfo-E_filegroup"],
+    sub_dir: "terminfo/E",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-h_filegroup",
     srcs: ["lib/terminfo/h/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-h",
+    srcs: [":libncurses-terminfo-h_filegroup"],
     sub_dir: "terminfo/h",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-l",
+    name: "libncurses-terminfo-h_recovery",
+    srcs: [":libncurses-terminfo-h_filegroup"],
+    sub_dir: "terminfo/h",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-l_filegroup",
     srcs: ["lib/terminfo/l/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-l",
+    srcs: [":libncurses-terminfo-l_filegroup"],
     sub_dir: "terminfo/l",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-m",
+    name: "libncurses-terminfo-l_recovery",
+    srcs: [":libncurses-terminfo-l_filegroup"],
+    sub_dir: "terminfo/l",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-m_filegroup",
     srcs: ["lib/terminfo/m/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-m",
+    srcs: [":libncurses-terminfo-m_filegroup"],
     sub_dir: "terminfo/m",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-p",
+    name: "libncurses-terminfo-m_recovery",
+    srcs: [":libncurses-terminfo-m_filegroup"],
+    sub_dir: "terminfo/m",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-p_filegroup",
     srcs: ["lib/terminfo/p/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-p",
+    srcs: [":libncurses-terminfo-p_filegroup"],
     sub_dir: "terminfo/p",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-r",
+    name: "libncurses-terminfo-p_recovery",
+    srcs: [":libncurses-terminfo-p_filegroup"],
+    sub_dir: "terminfo/p",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-r_filegroup",
     srcs: ["lib/terminfo/r/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-r",
+    srcs: [":libncurses-terminfo-r_filegroup"],
     sub_dir: "terminfo/r",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-s",
+    name: "libncurses-terminfo-r_recovery",
+    srcs: [":libncurses-terminfo-r_filegroup"],
+    sub_dir: "terminfo/r",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-s_filegroup",
     srcs: ["lib/terminfo/s/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-s",
+    srcs: [":libncurses-terminfo-s_filegroup"],
     sub_dir: "terminfo/s",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-t",
+    name: "libncurses-terminfo-s_recovery",
+    srcs: [":libncurses-terminfo-s_filegroup"],
+    sub_dir: "terminfo/s",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-t_filegroup",
     srcs: ["lib/terminfo/t/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-t",
+    srcs: [":libncurses-terminfo-t_filegroup"],
     sub_dir: "terminfo/t",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-v",
+    name: "libncurses-terminfo-t_recovery",
+    srcs: [":libncurses-terminfo-t_filegroup"],
+    sub_dir: "terminfo/t",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-u_filegroup",
+    srcs: ["lib/terminfo/u/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-u",
+    srcs: [":libncurses-terminfo-u_filegroup"],
+    sub_dir: "terminfo/u",
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-u_recovery",
+    srcs: [":libncurses-terminfo-u_filegroup"],
+    sub_dir: "terminfo/u",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-v_filegroup",
     srcs: ["lib/terminfo/v/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-v",
+    srcs: [":libncurses-terminfo-v_filegroup"],
     sub_dir: "terminfo/v",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-w",
+    name: "libncurses-terminfo-v_recovery",
+    srcs: [":libncurses-terminfo-v_filegroup"],
+    sub_dir: "terminfo/v",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-w_filegroup",
     srcs: ["lib/terminfo/w/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-w",
+    srcs: [":libncurses-terminfo-w_filegroup"],
     sub_dir: "terminfo/w",
     system_ext_specific: true,
 }
 
 prebuilt_etc {
-    name: "libncurses-terminfo-x",
+    name: "libncurses-terminfo-w_recovery",
+    srcs: [":libncurses-terminfo-w_filegroup"],
+    sub_dir: "terminfo/w",
+    recovery: true,
+}
+
+filegroup {
+    name: "libncurses-terminfo-x_filegroup",
     srcs: ["lib/terminfo/x/*"],
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "libncurses-terminfo-x",
+    srcs: [":libncurses-terminfo-x_filegroup"],
     sub_dir: "terminfo/x",
     system_ext_specific: true,
 }
 
-cc_library {
-    name: "libncurses",
+prebuilt_etc {
+    name: "libncurses-terminfo-x_recovery",
+    srcs: [":libncurses-terminfo-x_filegroup"],
+    sub_dir: "terminfo/x",
+    recovery: true,
+}
+
+cc_defaults {
+    name: "libncurses_defaults",
     srcs: [
         "ncurses/base/define_key.c",
         "ncurses/base/key_defined.c",
@@ -264,6 +466,11 @@ cc_library {
     local_include_dirs: [
         "ncurses",
     ],
+}
+
+cc_library {
+    name: "libncurses",
+    defaults: ["libncurses_defaults"],
     required: [
         "libncurses-terminfo-a",
         "libncurses-terminfo-c",
@@ -281,4 +488,26 @@ cc_library {
         "libncurses-terminfo-x",
     ],
     system_ext_specific: true,
+}
+
+cc_library {
+    name: "libncurses_recovery",
+    defaults: ["libncurses_defaults"],
+    required: [
+        "libncurses-terminfo-a_recovery",
+        "libncurses-terminfo-c_recovery",
+        "libncurses-terminfo-d_recovery",
+        "libncurses-terminfo-E_recovery",
+        "libncurses-terminfo-h_recovery",
+        "libncurses-terminfo-l_recovery",
+        "libncurses-terminfo-m_recovery",
+        "libncurses-terminfo-p_recovery",
+        "libncurses-terminfo-r_recovery",
+        "libncurses-terminfo-s_recovery",
+        "libncurses-terminfo-t_recovery",
+        "libncurses-terminfo-v_recovery",
+        "libncurses-terminfo-w_recovery",
+        "libncurses-terminfo-x_recovery",
+    ],
+    recovery: true,
 }
