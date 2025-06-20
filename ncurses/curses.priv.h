@@ -1949,7 +1949,7 @@ extern	NCURSES_EXPORT(void) name (void); \
 		? sp->_dch_cost \
 		: ((delete_character != 0) \
 			? (sp->_dch1_cost * count) \
-			: INFINITY))
+			: NCURSES_INFINITY))
 
 #define InsCharCost(sp,count) \
 		((parm_ich != 0) \
@@ -1958,7 +1958,7 @@ extern	NCURSES_EXPORT(void) name (void); \
 		  ? sp->_smir_cost + sp->_rmir_cost + (sp->_ip_cost * count) \
 		  : ((insert_character != 0) \
 		    ? ((sp->_ich1_cost + sp->_ip_cost) * count) \
-		    : INFINITY)))
+		    : NCURSES_INFINITY)))
 
 #if USE_XMC_SUPPORT
 #define UpdateAttrs(sp,c) if (!SameAttrOf(SCREEN_ATTRS(sp), c)) { \
@@ -2131,7 +2131,7 @@ extern NCURSES_EXPORT(int) _nc_wgetch(WINDOW *, int *, int EVENTLIST_2nd(_nc_eve
 extern NCURSES_EXPORT(int) _nc_insert_ch(SCREEN *, WINDOW *, chtype);
 
 /* lib_mvcur.c */
-#define INFINITY	1000000	/* cost: too high to use */
+#define NCURSES_INFINITY	1000000	/* cost: too high to use */
 
 extern NCURSES_EXPORT(int) _nc_mvcur(int yold, int xold, int ynew, int xnew);
 
@@ -2149,7 +2149,7 @@ extern NCURSES_EXPORT(void) _nc_screen_wrap (void);
 extern NCURSES_EXPORT(bool) _nc_has_mouse (SCREEN *);
 
 /* lib_mvcur.c */
-#define INFINITY	1000000	/* cost: too high to use */
+#define NCURSES_INFINITY	1000000	/* cost: too high to use */
 #define BAUDBYTE	9	/* 9 = 7 bits + 1 parity + 1 stop */
 
 /* lib_setup.c */
