@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2022,2023 Thomas E. Dickey                                *
  * Copyright 2016,2017 Free Software Foundation, Inc.                       *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,7 +27,7 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: list_keys.c,v 1.31 2022/12/10 23:23:27 tom Exp $
+ * $Id: list_keys.c,v 1.33 2023/11/11 00:35:05 tom Exp $
  *
  * Author: Thomas E Dickey
  *
@@ -52,7 +52,10 @@
 static bool f_opt = FALSE;
 static bool m_opt = FALSE;
 static bool t_opt = FALSE;
+
+#if NCURSES_XNAMES || HAVE_USE_EXTENDED_NAMES
 static bool x_opt = FALSE;
+#endif
 
 typedef enum {
     ktCursor
@@ -70,6 +73,13 @@ typedef struct {
 
 #define Type(n) list[n].type
 #define Name(n) list[n].name
+
+static void
+failed(const char *msg)
+{
+    perror(msg);
+    ExitProgram(EXIT_FAILURE);
+}
 
 static const char *
 full_name(const char *name)
@@ -338,8 +348,11 @@ list_keys(TERMINAL **terms, int count)
 	widths1 = (int) strlen(modifier);
 
     for (k = 0; k < count; ++k) {
+	char *value;
 	set_curterm(terms[k]);
-	check = (int) strlen(termname());
+	if ((value = termname()) == NULL)
+	    failed("termname");
+	check = (int) strlen(value);
 	if (widths2 < check)
 	    widths2 = check;
     }
@@ -461,7 +474,7 @@ main(int argc, char *argv[])
 	case 't':
 	    t_opt = TRUE;
 	    break;
-#ifdef NCURSES_VERSION
+#if NCURSES_XNAMES || HAVE_USE_EXTENDED_NAMES
 	case 'x':
 	    x_opt = TRUE;
 	    break;

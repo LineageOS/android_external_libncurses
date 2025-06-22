@@ -1,5 +1,5 @@
 .\"***************************************************************************
-.\" Copyright 2018-2021,2022 Thomas E. Dickey                                *
+.\" Copyright 2018-2023,2024 Thomas E. Dickey                                *
 .\" Copyright 1998-2010,2015 Free Software Foundation, Inc.                  *
 .\"                                                                          *
 .\" Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,61 +27,51 @@
 .\" authorization.                                                           *
 .\"***************************************************************************
 .\"
-.\" $Id: curs_termattrs.3x,v 1.19 2022/02/12 20:05:11 tom Exp $
-.TH curs_termattrs 3X ""
+.\" $Id: curs_termattrs.3x,v 1.41 2024/04/20 21:20:07 tom Exp $
+.TH curs_termattrs 3X 2024-04-20 "ncurses @NCURSES_MAJOR@.@NCURSES_MINOR@" "Library calls"
 .SH NAME
-\fBbaudrate\fP,
-\fBerasechar\fP,
-\fBerasewchar\fP,
-\fBhas_ic\fP,
-\fBhas_il\fP,
-\fBkillchar\fP,
-\fBkillwchar\fP,
-\fBlongname\fP,
-\fBterm_attrs\fP,
-\fBtermattrs\fP,
-\fBtermname\fP \- \fBcurses\fP environment query routines
+\fB\%baudrate\fP,
+\fB\%erasechar\fP,
+\fB\%erasewchar\fP,
+\fB\%has_ic\fP,
+\fB\%has_il\fP,
+\fB\%killchar\fP,
+\fB\%killwchar\fP,
+\fB\%longname\fP,
+\fB\%term_attrs\fP,
+\fB\%termattrs\fP,
+\fB\%termname\fP \-
+\fIcurses\fR environment query routines
 .SH SYNOPSIS
-\fB#include <curses.h>\fP
+.nf
+\fB#include <curses.h>
 .PP
-\fBint baudrate(void);\fP
-.br
-\fBchar erasechar(void);\fP
-.br
-\fBint erasewchar(wchar_t *\fIch\fB);\fR
-.br
-\fBbool has_ic(void);\fP
-.br
-\fBbool has_il(void);\fP
-.br
-\fBchar killchar(void);\fP
-.br
-\fBint killwchar(wchar_t *\fIch\fB);\fR
-.br
-\fBchar *longname(void);\fP
-.br
-\fBattr_t term_attrs(void);\fP
-.br
-\fBchtype termattrs(void);\fP
-.br
-\fBchar *termname(void);\fP
-.br
+\fBint baudrate(void);
+\fBchar erasechar(void);
+\fBint erasewchar(wchar_t *\fIwc\fP);
+\fBbool has_ic(void);
+\fBbool has_il(void);
+\fBchar killchar(void);
+\fBint killwchar(wchar_t *\fIwc\fP);
+\fBchar *longname(void);
+\fBattr_t term_attrs(void);
+\fBchtype termattrs(void);
+\fBchar *termname(void);
+.fi
 .SH DESCRIPTION
 .SS baudrate
 The \fBbaudrate\fP routine returns the output speed of the terminal.
 The
 number returned is in bits per second, for example \fB9600\fP, and is an
 integer.
-.SS erasechar, erasewchar
-.PP
+.SS "erasechar, erasewchar"
 The \fBerasechar\fP routine returns the user's current erase character.
 .PP
 The \fBerasewchar\fP routine stores the current erase character
-in the location referenced by \fIch\fP.
+in the location referenced by \fIwc\fP.
 If no erase character has been defined, the routine fails
-and the location referenced by \fIch\fP is not changed.
-.SS has_is, has_il
-.PP
+and the location referenced by \fIwc\fP is not changed.
+.SS "has_ic, has_il"
 The \fBhas_ic\fP routine is true if the terminal has insert- and delete-
 character capabilities.
 .PP
@@ -89,17 +79,15 @@ The \fBhas_il\fP routine is true if the terminal has insert- and delete-line
 capabilities, or can simulate them using scrolling regions.
 This might
 be used to determine if it would be appropriate to turn on physical
-scrolling using \fBscrollok\fP.
-.SS killchar, killwchar
-.PP
+scrolling using \fBscrollok\fP(3X).
+.SS "killchar, killwchar"
 The \fBkillchar\fP routine returns the user's current line kill character.
 .PP
 The \fBkillwchar\fP routine stores the current line-kill character
-in the location referenced by \fIch\fP.
+in the location referenced by \fIwc\fP.
 If no line-kill character has been defined,
-the routine fails and the location referenced by \fIch\fP is not changed.
+the routine fails and the location referenced by \fIwc\fP is not changed.
 .SS longname
-.PP
 The \fBlongname\fP routine returns a pointer to a static area
 containing a verbose description of the current terminal.
 The maximum
@@ -110,8 +98,7 @@ overwritten by each call to \fBnewterm\fP and is not restored by
 \fBset_term\fP, so the value should be saved between calls to
 \fBnewterm\fP if \fBlongname\fP is going to be used with multiple
 terminals.
-.SS termattrs, term_attrs
-.PP
+.SS "termattrs, term_attrs"
 If a given terminal does not support a video attribute that an
 application program is trying to use, \fBcurses\fP may substitute a
 different video attribute for it.
@@ -121,7 +108,6 @@ terminal using \fBA_\fP and \fBWA_\fP constants respectively.
 This information is useful when a \fBcurses\fP program
 needs complete control over the appearance of the screen.
 .SS termname
-.PP
 The \fBtermname\fP routine returns the terminal name used by \fBsetupterm\fP.
 .SH RETURN VALUE
 \fBlongname\fP and \fBtermname\fP return \fBNULL\fP on error.
@@ -132,10 +118,12 @@ completion.
 .SH NOTES
 Note that \fBtermattrs\fP may be a macro.
 .SH PORTABILITY
-The XSI Curses standard, Issue 4 describes these functions.
+X/Open Curses, Issue 4 describes these functions.
 It changes the
 return type of \fBtermattrs\fP to the new type \fBattr_t\fP.
 Most versions of curses truncate the result returned by \fBtermname\fP to
 14 characters.
 .SH SEE ALSO
-\fBcurses\fP(3X), \fBcurs_initscr\fP(3X), \fBcurs_outopts\fP(3X)
+\fB\%curses\fP(3X),
+\fB\%curs_initscr\fP(3X),
+\fB\%curs_outopts\fP(3X)

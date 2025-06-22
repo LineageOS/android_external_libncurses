@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2020,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2023,2024 Thomas E. Dickey                                *
  * Copyright 2002-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,7 +27,7 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: demo_defkey.c,v 1.33 2022/12/10 23:31:31 tom Exp $
+ * $Id: demo_defkey.c,v 1.35 2024/01/20 20:46:12 tom Exp $
  *
  * Demonstrate the define_key() function.
  * Thomas Dickey - 2002/11/23
@@ -100,7 +100,7 @@ visible(const char *string)
 {
     char *result = 0;
 
-    if (string != 0 && *string != '\0') {
+    if (VALID_STRING(string) && *string != '\0') {
 	int pass;
 	int n;
 	size_t need = 1;
@@ -148,11 +148,7 @@ really_define_key(WINDOW *win, const char *new_string, int code)
     }
     log_last_line(win);
 
-    if (vis_string != 0) {
-	free(vis_string);
-	vis_string = 0;
-    }
-
+    free(vis_string);
     vis_string = visible(new_string);
     if ((rc = key_defined(new_string)) > 0) {
 	wprintw(win, "%s was bound to %s\n", vis_string, keyname(rc));
@@ -185,7 +181,7 @@ duplicate(WINDOW *win, NCURSES_CONST char *name, int code)
 {
     char *value = tigetstr(name);
 
-    if (value != 0) {
+    if (VALID_STRING(value)) {
 	const char *prefix = 0;
 
 	if (!(strncmp) (value, "\033[", (size_t) 2)) {

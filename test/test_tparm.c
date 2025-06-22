@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2020-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2020-2022,2023 Thomas E. Dickey                                *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -29,17 +29,33 @@
 /*
  * Author: Thomas E. Dickey
  *
- * $Id: test_tparm.c,v 1.24 2022/12/10 23:23:27 tom Exp $
+ * $Id: test_tparm.c,v 1.39 2023/11/11 01:00:03 tom Exp $
  *
- * Exercise tparm, either for all possible capabilities with fixed parameters,
- * or one capability with all possible parameters.
- *
- * TODO: incorporate tic.h and _nc_tparm_analyze
- * TODO: optionally test tiparm
- * TODO: add checks/logic to handle "%s" in tparm
+ * Exercise tparm/tiparm, either for all possible capabilities with fixed
+ * parameters, or one capability with specific combinations of parameters.
  */
 #define USE_TINFO
 #include <test.priv.h>
+
+#if NCURSES_XNAMES
+#if HAVE_TERM_ENTRY_H
+#include <term_entry.h>
+#else
+#undef NCURSES_XNAMES
+#define NCURSES_XNAMES 0
+#endif
+#endif
+
+#define MAX_PARM 9
+
+#define GrowArray(array,limit,length) \
+	    if (length + 2 >= limit) { \
+		limit *= 2; \
+		array = typeRealloc(char *, limit, array); \
+		if (array == 0) { \
+		    failed("no memory: " #array); \
+		} \
+	    }
 
 static GCC_NORETURN void failed(const char *);
 
@@ -55,6 +71,14 @@ failed(const char *msg)
 static int a_opt;
 static int p_opt;
 static int v_opt;
+
+#if HAVE_TIPARM
+static int i_opt;
+#endif
+
+#if HAVE_TIPARM_S
+static int s_opt;
+#endif
 
 /*
  * Total tests (and failures):
@@ -119,13 +143,13 @@ relevant(const char *name, const char *value)
 }
 
 static int
-increment(int *all_parms, int *num_parms, int len_parms, int end_parms)
+increment(long *all_parms, int *num_parms, int len_parms, int end_parms)
 {
     int rc = 0;
     int n;
 
-    if (len_parms > 9)
-	len_parms = 9;
+    if (len_parms > MAX_PARM)
+	len_parms = MAX_PARM;
 
     if (end_parms < len_parms) {
 	if (all_parms[end_parms]++ >= num_parms[end_parms]) {
@@ -143,38 +167,187 @@ increment(int *all_parms, int *num_parms, int len_parms, int end_parms)
     return rc;
 }
 
-static void
-test_tparm(const char *name, const char *format, int *number)
+/* parse the format string to determine which positional parameters
+ * are assumed to be strings.
+ */
+#if HAVE_TISCAN_S
+static int
+analyze_format(const char *format, int *mask, char **p_is_s)
 {
-    char *result = tparm(format,
-			 number[0],
-			 number[1],
-			 number[2],
-			 number[3],
-			 number[4],
-			 number[5],
-			 number[6],
-			 number[7],
-			 number[8]);
+    int arg_count;
+    int arg_mask;
+    int n;
+    if (tiscan_s(&arg_count, &arg_mask, format) == OK) {
+	*mask = arg_mask;
+	for (n = 0; n < MAX_PARM; ++n) {
+	    static char dummy[1];
+	    p_is_s[n] = (arg_mask & 1) ? dummy : NULL;
+	    arg_mask >>= 1;
+	}
+    } else {
+	*mask = 0;
+	arg_count = 0;
+	for (n = 0; n < MAX_PARM; ++n) {
+	    p_is_s[n] = NULL;
+	}
+    }
+    return arg_count;
+}
+#elif HAVE__NC_TPARM_ANALYZE
+extern int _nc_tparm_analyze(TERMINAL *, const char *, char **, int *);
+
+static int
+analyze_format(const char *format, int *mask, char **p_is_s)
+{
+    int popcount = 0;
+    int analyzed = _nc_tparm_analyze(cur_term, format, p_is_s, &popcount);
+    int n;
+    if (analyzed < popcount) {
+	analyzed = popcount;
+    }
+    *mask = 0;
+    for (n = 0; n < MAX_PARM; ++n) {
+	if (p_is_s[n])
+	    *mask |= (1 << n);
+    }
+    return analyzed;
+}
+#else
+/* TODO: make this work without direct use of ncurses internals. */
+static int
+analyze_format(const char *format, int *mask, char **p_is_s)
+{
+    int n;
+    char *filler = strstr(format, "%s");
+    *mask = 0;
+    for (n = 0; n < MAX_PARM; ++n) {
+	p_is_s[n] = filler;
+    }
+    return n;
+}
+#endif
+
+#define NumStr(n) use_strings[n] \
+ 		  ? (long) (my_intptr_t) (number[n] \
+		     ? string[n] \
+		     : NULL) \
+		  : number[n]
+
+#define NS_0(fmt)	fmt
+#define NS_1(fmt)	NS_0(fmt), NumStr(0)
+#define NS_2(fmt)	NS_1(fmt), NumStr(1)
+#define NS_3(fmt)	NS_2(fmt), NumStr(2)
+#define NS_4(fmt)	NS_3(fmt), NumStr(3)
+#define NS_5(fmt)	NS_4(fmt), NumStr(4)
+#define NS_6(fmt)	NS_5(fmt), NumStr(5)
+#define NS_7(fmt)	NS_6(fmt), NumStr(6)
+#define NS_8(fmt)	NS_7(fmt), NumStr(7)
+#define NS_9(fmt)	NS_8(fmt), NumStr(8)
+
+static void
+test_tparm(const char *name, const char *format, long *number, char **string)
+{
+    char *use_strings[MAX_PARM];
+    char *result = NULL;
+    int nparam;
+    int mask;
+
+    nparam = analyze_format(format, &mask, use_strings);
+#if HAVE_TIPARM_S
+    if (s_opt) {
+	switch (nparam) {
+	case 0:
+	    result = tiparm_s(0, mask, NS_0(format));
+	    break;
+	case 1:
+	    result = tiparm_s(1, mask, NS_1(format));
+	    break;
+	case 2:
+	    result = tiparm_s(2, mask, NS_2(format));
+	    break;
+	case 3:
+	    result = tiparm_s(3, mask, NS_3(format));
+	    break;
+	case 4:
+	    result = tiparm_s(4, mask, NS_4(format));
+	    break;
+	case 5:
+	    result = tiparm_s(5, mask, NS_5(format));
+	    break;
+	case 6:
+	    result = tiparm_s(6, mask, NS_6(format));
+	    break;
+	case 7:
+	    result = tiparm_s(7, mask, NS_7(format));
+	    break;
+	case 8:
+	    result = tiparm_s(8, mask, NS_8(format));
+	    break;
+	case 9:
+	    result = tiparm_s(9, mask, NS_9(format));
+	    break;
+	}
+    } else
+#endif
+#if HAVE_TIPARM
+    if (i_opt) {
+	switch (nparam) {
+	case 0:
+	    result = tiparm(NS_0(format));
+	    break;
+	case 1:
+	    result = tiparm(NS_1(format));
+	    break;
+	case 2:
+	    result = tiparm(NS_2(format));
+	    break;
+	case 3:
+	    result = tiparm(NS_3(format));
+	    break;
+	case 4:
+	    result = tiparm(NS_4(format));
+	    break;
+	case 5:
+	    result = tiparm(NS_5(format));
+	    break;
+	case 6:
+	    result = tiparm(NS_6(format));
+	    break;
+	case 7:
+	    result = tiparm(NS_7(format));
+	    break;
+	case 8:
+	    result = tiparm(NS_8(format));
+	    break;
+	case 9:
+	    result = tiparm(NS_9(format));
+	    break;
+	}
+    } else
+#endif
+	result = tparm(NS_9(format));
     total_tests++;
     if (result != NULL) {
 	tputs(result, 1, output_func);
     } else {
 	total_fails++;
     }
-    if (v_opt > 1)
-	printf(".. %2d = %2d %2d %2d %2d %2d %2d %2d %2d %2d %s\n",
-	       result != 0 ? (int) strlen(result) : -1,
-	       number[0],
-	       number[1],
-	       number[2],
-	       number[3],
-	       number[4],
-	       number[5],
-	       number[6],
-	       number[7],
-	       number[8],
-	       name);
+    if (v_opt > 1) {
+	int n;
+	printf(".. %3d =", result != 0 ? (int) strlen(result) : -1);
+	for (n = 0; n < nparam; ++n) {
+	    if (use_strings[n]) {
+		if (number[n]) {
+		    printf(" \"%s\"", string[n]);
+		} else {
+		    printf("  ?");
+		}
+	    } else {
+		printf(" %2ld", number[n]);
+	    }
+	}
+	printf(" %s\n", name);
+    }
 }
 
 static void
@@ -192,8 +365,14 @@ usage(int ok)
 	,"          to read a list from standard-input"
 	," -a       test all combinations of parameters"
 	,"          [value1...] forms a vector of maximum parameter-values."
+#if HAVE_TIPARM
+	," -i       test tiparm rather than tparm"
+#endif
 	," -p       test capabilities with no parameters but having padding"
 	," -r NUM   repeat tests NUM times"
+#if HAVE_TIPARM_S
+	," -s       test tiparm_s rather than tparm"
+#endif
 	," -v       show values and results"
     };
     unsigned n;
@@ -221,17 +400,20 @@ main(int argc, char *argv[])
     int r_opt = 1;
     char *t_opt = 0;
 
+    int std_caps = 0;		/* predefine items in all_caps[] */
     int len_caps = 0;		/* cur # of items in all_caps[] */
     int max_caps = 10;		/* max # of items in all_caps[] */
     char **all_caps = typeCalloc(char *, max_caps);
 
-    int all_parms[10];		/* workspace for "-a" option */
+    long all_parms[10];		/* workspace for "-a" option */
 
     int len_terms = 0;		/* cur # of items in all_terms[] */
     int max_terms = 10;		/* max # of items in all_terms[] */
     char **all_terms = typeCalloc(char *, max_terms);
 
     int use_caps;
+    int max_name = 10;		/* max # of items in cap_name[] */
+    int max_data = 10;		/* max # of items in cap_data[] */
     char **cap_name;
     char **cap_data;
 
@@ -244,7 +426,7 @@ main(int argc, char *argv[])
     if (all_caps == 0 || all_terms == 0 || num_parms == 0 || str_parms == 0)
 	failed("no memory");
 
-    while ((ch = getopt(argc, argv, OPTS_COMMON "T:apr:v")) != -1) {
+    while ((ch = getopt(argc, argv, OPTS_COMMON "T:aipr:sv")) != -1) {
 	switch (ch) {
 	case 'T':
 	    t_opt = optarg;
@@ -252,12 +434,22 @@ main(int argc, char *argv[])
 	case 'a':
 	    ++a_opt;
 	    break;
+#if HAVE_TIPARM
+	case 'i':
+	    ++i_opt;
+	    break;
+#endif
 	case 'p':
 	    ++p_opt;
 	    break;
 	case 'r':
 	    r_opt = atoi(optarg);
 	    break;
+#if HAVE_TIPARM_S
+	case 's':
+	    ++s_opt;
+	    break;
+#endif
 	case 'v':
 	    ++v_opt;
 	    break;
@@ -370,13 +562,7 @@ main(int argc, char *argv[])
     if (len_caps == 0) {
 #if defined(HAVE_CURSES_DATA_BOOLNAMES) || defined(DECL_CURSES_DATA_BOOLNAMES)
 	for (n = 0; strnames[n] != 0; ++n) {
-	    if (len_caps + 2 >= max_caps) {
-		max_caps *= 2;
-		all_caps = typeRealloc(char *, max_caps, all_caps);
-		if (all_caps == 0) {
-		    failed("no memory: all_caps");
-		}
-	    }
+	    GrowArray(all_caps, max_caps, len_caps);
 	    all_caps[len_caps++] = strdup(strnames[n]);
 	}
 #else
@@ -384,6 +570,7 @@ main(int argc, char *argv[])
 	all_caps[len_caps++] = strdup("sgr");
 #endif
     }
+    std_caps = len_caps;
     all_caps[len_caps] = 0;
     if (v_opt) {
 	printf("%d name%s%s\n", PLURAL(len_caps), COLONS(len_caps));
@@ -394,8 +581,8 @@ main(int argc, char *argv[])
 	}
     }
 
-    cap_name = typeMalloc(char *, len_caps);
-    cap_data = typeMalloc(char *, len_caps);
+    cap_name = typeMalloc(char *, (max_name = 1 + len_caps));
+    cap_data = typeMalloc(char *, (max_data = 1 + len_caps));
 
     if (r_opt <= 0)
 	r_opt = 1;
@@ -413,6 +600,20 @@ main(int argc, char *argv[])
 	    if (setupterm(all_terms[t_run], fileno(stdout), &errs) != OK) {
 		printf("** skipping %s (errs:%d)\n", all_terms[t_run], errs);
 	    }
+#if NCURSES_XNAMES
+	    len_caps = std_caps;
+	    if (cur_term) {
+		TERMTYPE *term = (TERMTYPE *) cur_term;
+		for (n = STRCOUNT; n < NUM_STRINGS(term); ++n) {
+		    GrowArray(all_caps, max_caps, len_caps);
+		    GrowArray(cap_name, max_name, len_caps);
+		    GrowArray(cap_data, max_data, len_caps);
+		    all_caps[len_caps++] = strdup(ExtStrname(term, (int) n, strnames));
+		}
+	    }
+#else
+	    (void) std_caps;
+#endif
 
 	    /*
 	     * Most of the capabilities have no parameters, e.g., they are
@@ -430,7 +631,7 @@ main(int argc, char *argv[])
 	    }
 
 	    if (v_opt) {
-		printf("[%d:%d] %d cap%s * %ld param%s \"%s\"\n",
+		printf("[%d:%d] %d paramerized cap%s * %ld test-case%s \"%s\"\n",
 		       r_run + 1, r_opt,
 		       PLURAL(use_caps),
 		       PLURAL(use_parms),
@@ -442,16 +643,27 @@ main(int argc, char *argv[])
 		/* for each combination of values */
 		do {
 		    for (n_run = 0; n_run < use_caps; ++n_run) {
-			test_tparm(cap_name[n_run], cap_data[n_run], all_parms);
+			test_tparm(cap_name[n_run],
+				   cap_data[n_run],
+				   all_parms,
+				   str_parms);
 		    }
 		}
 		while (increment(all_parms, num_parms, len_parms, 0));
 	    } else {
 		/* for the given values */
 		for (n_run = 0; n_run < use_caps; ++n_run) {
-		    test_tparm(cap_name[n_run], cap_data[n_run], all_parms);
+		    test_tparm(cap_name[n_run],
+			       cap_data[n_run],
+			       all_parms,
+			       str_parms);
 		}
 	    }
+#if NCURSES_XNAMES
+	    for (n = std_caps; n < len_caps; ++n) {
+		free(all_caps[n]);
+	    }
+#endif
 	    if (cur_term != 0) {
 		del_curterm(cur_term);
 	    } else {
@@ -470,7 +682,7 @@ main(int argc, char *argv[])
     printf(NUMFORM " printable\n", total_print);
     printf(NUMFORM " total\n", total_nulls + total_ctrls + total_print);
 #if NO_LEAKS
-    for (n = 0; n < len_caps; ++n) {
+    for (n = 0; n < std_caps; ++n) {
 	free(all_caps[n]);
     }
     free(all_caps);

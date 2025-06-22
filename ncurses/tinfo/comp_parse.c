@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2023,2024 Thomas E. Dickey                                *
  * Copyright 1998-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -48,7 +48,7 @@
 
 #include <tic.h>
 
-MODULE_ID("$Id: comp_parse.c,v 1.131 2022/10/23 13:15:58 tom Exp $")
+MODULE_ID("$Id: comp_parse.c,v 1.134 2024/02/10 15:52:11 tom Exp $")
 
 static void sanity_check2(TERMTYPE2 *, bool);
 NCURSES_IMPEXP void (NCURSES_API *_nc_check_termtype2) (TERMTYPE2 *, bool) = sanity_check2;
@@ -225,7 +225,7 @@ _nc_read_entry_source(FILE *fp, char *buf,
 	  (T_CALLED("_nc_read_entry_source("
 		    "file=%p, buf=%p, literal=%d, silent=%d, hook=%#"
 		    PRIxPTR ")"),
-	   (void *) fp, buf, literal, silent, (intptr_t) hook));
+	   (void *) fp, buf, literal, silent, CASTxPTR(hook)));
 
     if (silent)
 	_nc_suppress_warnings = TRUE;	/* shut the lexer up, too */
@@ -264,8 +264,9 @@ _nc_read_entry_source(FILE *fp, char *buf,
 
     if (_nc_tail) {
 	/* set up the head pointer */
-	for (_nc_head = _nc_tail; _nc_head->last; _nc_head = _nc_head->last)
-	    continue;
+	for (_nc_head = _nc_tail; _nc_head->last; _nc_head = _nc_head->last) {
+	    /* EMPTY */ ;
+	}
 
 	DEBUG(2, ("head = %s", _nc_head->tterm.term_names));
 	DEBUG(2, ("tail = %s", _nc_tail->tterm.term_names));
@@ -403,7 +404,7 @@ _nc_resolve_uses2(bool fullresolve, bool literal)
     ENTRY *qp, *rp, *lastread = 0;
     bool keepgoing;
     unsigned i, j;
-    int unresolved, total_unresolved, multiples;
+    int total_unresolved, multiples;
 
     DEBUG(2, (T_CALLED("_nc_resolve_uses2")));
 
@@ -443,7 +444,6 @@ _nc_resolve_uses2(bool fullresolve, bool literal)
     total_unresolved = 0;
     _nc_curr_col = -1;
     for_entry_list(qp) {
-	unresolved = 0;
 	for (i = 0; i < qp->nuses; i++) {
 	    bool foundit;
 	    char *child = _nc_first_name(qp->tterm.term_names);
@@ -512,7 +512,6 @@ _nc_resolve_uses2(bool fullresolve, bool literal)
 
 	    /* no good, mark this one unresolvable and complain */
 	    if (!foundit) {
-		unresolved++;
 		total_unresolved++;
 
 		_nc_curr_line = (int) lookline;

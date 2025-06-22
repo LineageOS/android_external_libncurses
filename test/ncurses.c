@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2022,2023 Thomas E. Dickey                                *
  * Copyright 1998-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -41,23 +41,23 @@ AUTHOR
    Author: Eric S. Raymond <esr@snark.thyrsus.com> 1993
            Thomas E. Dickey (beginning revision 1.27 in 1996).
 
-$Id: ncurses.c,v 1.532 2022/12/04 00:40:11 tom Exp $
+$Id: ncurses.c,v 1.538 2023/11/11 01:23:59 tom Exp $
 
 ***************************************************************************/
 
+#define NEED_TIME_H 1
 #include <test.priv.h>
 
 #ifdef __hpux
 #undef mvwdelch			/* HPUX 11.23 macro will not compile */
 #endif
 
-#if HAVE_GETTIMEOFDAY
 #if HAVE_SYS_TIME_H && HAVE_SYS_TIME_SELECT
 #include <sys/time.h>
 #endif
+
 #if HAVE_SYS_SELECT_H
 #include <sys/select.h>
-#endif
 #endif
 
 #if USE_LIBPANEL
@@ -770,7 +770,7 @@ slk_repaint(void)
  * Resize both and paint the box in the parent.
  */
 static void
-resize_boxes(unsigned level, WINDOW *win)
+resize_boxes(unsigned level, const WINDOW *const win)
 {
     unsigned n;
     int base = 5;
@@ -1012,7 +1012,7 @@ getch_test(bool recur GCC_UNUSED)
  */
 #if defined(KEY_RESIZE) && HAVE_WRESIZE
 static void
-resize_wide_boxes(unsigned level, WINDOW *win)
+resize_wide_boxes(unsigned level, const WINDOW *const win)
 {
     unsigned n;
     int base = 5;
@@ -3157,7 +3157,7 @@ color_edit(bool recur GCC_UNUSED)
  *
  ****************************************************************************/
 static bool
-cycle_attr(int ch, unsigned *at_code, chtype *attr, ATTR_TBL * list, unsigned limit)
+cycle_attr(int ch, unsigned *at_code, attr_t *attr, ATTR_TBL * list, unsigned limit)
 {
     bool result = TRUE;
 
@@ -3318,7 +3318,7 @@ slk_test(bool recur GCC_UNUSED)
     int c, fmt = 1;
     char buf[9];
     char *s;
-    chtype attr = A_NORMAL;
+    attr_t attr = A_NORMAL;
     unsigned at_code = 0;
 #if HAVE_SLK_COLOR
     int fg = COLOR_BLACK;
@@ -3408,7 +3408,7 @@ slk_test(bool recur GCC_UNUSED)
 
 	default:
 	    if (cycle_attr(c, &at_code, &attr, my_list, my_size)) {
-		slk_attrset(attr);
+		slk_attrset((chtype) attr);
 		slk_touch();
 		slk_noutrefresh();
 		break;
@@ -3824,7 +3824,7 @@ acs_test(bool recur GCC_UNUSED)
     const char *pch_kludge = ((term != 0 && strstr(term, "linux"))
 			      ? "p=PC, "
 			      : "");
-    chtype attr = A_NORMAL;
+    attr_t attr = A_NORMAL;
     int digit = 0;
     int repeat = 1;
     int fg = COLOR_BLACK;
@@ -5600,10 +5600,8 @@ panner(WINDOW *pad,
        int (*pgetc) (WINDOW *),
        bool colored)
 {
-#if HAVE_GETTIMEOFDAY
-    struct timeval before, after;
+    TimeType before, after;
     bool timing = TRUE;
-#endif
     bool pan_lines = FALSE;
     bool scrollers = TRUE;
     int basex = 0;
@@ -5649,13 +5647,11 @@ panner(WINDOW *pad,
 	    pending_pan = FALSE;
 	    break;
 
-#if HAVE_GETTIMEOFDAY
 	case 't':
 	    timing = !timing;
 	    if (!timing)
 		panner_legend(LINES - 1);
 	    break;
-#endif
 	case 's':
 	    scrollers = !scrollers;
 	    break;
@@ -5828,9 +5824,7 @@ panner(WINDOW *pad,
 	MvAddCh(porty - 1, portx - 1, ACS_LRCORNER);
 
 	if (!pending_pan) {
-#if HAVE_GETTIMEOFDAY
-	    gettimeofday(&before, 0);
-#endif
+	    GetClockTime(&before);
 	    wnoutrefresh(stdscr);
 
 	    pnoutrefresh(pad,
@@ -5840,17 +5834,12 @@ panner(WINDOW *pad,
 			 portx - (pymax > porty) - 1);
 
 	    doupdate();
-#if HAVE_GETTIMEOFDAY
-#define TIMEVAL2S(data) ((double) data.tv_sec + ((double) data.tv_usec / 1.0e6))
 	    if (timing) {
-		double elapsed;
-		gettimeofday(&after, 0);
-		elapsed = (TIMEVAL2S(after) - TIMEVAL2S(before));
+		GetClockTime(&after);
 		move(LINES - 1, COLS - 12);
-		printw("Secs: %2.03f", elapsed);
+		printw("Secs: %6.03f", ElapsedSeconds(&before, &after));
 		refresh();
 	    }
-#endif
 	}
 
     } while
@@ -6172,7 +6161,6 @@ menu_test(bool recur GCC_UNUSED)
 	    break;
 	if (c == E_REQUEST_DENIED)
 	    beep();
-	continue;
     }
 
     MvPrintw(LINES - 2, 0,
@@ -6340,8 +6328,9 @@ trace_set(bool recur GCC_UNUSED)
 	    set_item_value(*ip, TRUE);
     }
 
-    while (run_trace_menu(m))
-	continue;
+    while (run_trace_menu(m)) {
+	/* EMPTY */ ;
+    }
 
     newtrace = 0;
     for (ip = menu_items(m); *ip; ip++)
@@ -6380,7 +6369,7 @@ make_label(int frow, int fcol, NCURSES_CONST char *label)
 
     if (f) {
 	set_field_buffer(f, 0, label);
-	set_field_opts(f, (int) ((unsigned) field_opts(f) & ~O_ACTIVE));
+	set_field_opts(f, (int) ((unsigned) field_opts(f) & (unsigned) ~O_ACTIVE));
     }
     return (f);
 }

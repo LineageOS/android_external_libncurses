@@ -1,5 +1,5 @@
 /****************************************************************************
-,* Copyright 2020-2021,2022 Thomas E. Dickey                                *
+,* Copyright 2020-2022,2023 Thomas E. Dickey                                *
  * Copyright 1998-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -51,7 +51,7 @@
 #include <ctype.h>
 #include <tic.h>
 
-MODULE_ID("$Id: comp_scan.c,v 1.119 2022/08/07 00:20:26 tom Exp $")
+MODULE_ID("$Id: comp_scan.c,v 1.122 2023/05/27 20:13:10 tom Exp $")
 
 /*
  * Maximum length of string capability we'll accept before raising an error.
@@ -302,7 +302,7 @@ push_back(int c)
 /* push a character back onto the input stream */
 {
     if (bufptr == bufstart)
-	_nc_syserr_abort("Can't backspace off beginning of line");
+	_nc_syserr_abort("cannot backspace off beginning of line");
     *--bufptr = (char) c;
     _nc_curr_col--;
 }
@@ -311,7 +311,7 @@ static long
 stream_pos(void)
 /* return our current character position in the input stream */
 {
-    return (yyin ? ftell(yyin) : (bufptr ? bufptr - bufstart : 0));
+    return (yyin ? ftell(yyin) : (bufptr ? (long) (bufptr - bufstart) : 0));
 }
 
 static bool
@@ -328,9 +328,11 @@ end_of_stream(void)
 static NCURSES_INLINE int
 eat_escaped_newline(int ch)
 {
-    if (ch == '\\')
-	while ((ch = next_char()) == '\n' || iswhite(ch))
-	    continue;
+    if (ch == '\\') {
+	while ((ch = next_char()) == '\n' || iswhite(ch)) {
+	    /* EMPTY */ ;
+	}
+    }
     return ch;
 }
 
@@ -434,7 +436,6 @@ _nc_get_token(bool silent)
     while ((ch = next_char()) == '\n' || iswhite(ch)) {
 	if (ch == '\n')
 	    had_newline = TRUE;
-	continue;
     }
 
     ch = eat_escaped_newline(ch);
@@ -459,8 +460,9 @@ _nc_get_token(bool silent)
 	    dot_flag = TRUE;
 	    DEBUG(8, ("dot-flag set"));
 
-	    while ((ch = next_char()) == '.' || iswhite(ch))
-		continue;
+	    while ((ch = next_char()) == '.' || iswhite(ch)) {
+		/* EMPTY */ ;
+	    }
 	}
 
 	if (ch == EOF) {
@@ -601,8 +603,9 @@ _nc_get_token(bool silent)
 		/* throw away trailing /, *$/ */
 		for (--tok_ptr;
 		     iswhite(*tok_ptr) || *tok_ptr == ',';
-		     tok_ptr--)
-		    continue;
+		     tok_ptr--) {
+		    /* EMPTY */ ;
+		}
 		tok_ptr[1] = '\0';
 	    }
 
@@ -831,7 +834,7 @@ _nc_get_token(bool silent)
  */
 
 NCURSES_EXPORT(int)
-_nc_trans_string(char *ptr, char *last)
+_nc_trans_string(char *ptr, const char *const last)
 {
     int count = 0;
     int number = 0;
