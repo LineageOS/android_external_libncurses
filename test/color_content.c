@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2019,2020 Thomas E. Dickey                                *
+ * Copyright 2018-2020,2022 Thomas E. Dickey                                *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -26,7 +26,7 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: color_content.c,v 1.12 2020/02/02 23:34:34 tom Exp $
+ * $Id: color_content.c,v 1.18 2022/12/10 22:28:50 tom Exp $
  */
 
 #define NEED_TIME_H
@@ -118,6 +118,7 @@ random_color(void)
 static void
 setup_test(void)
 {
+    setlocale(LC_ALL, "");
     initscr();
     cbreak();
     noecho();
@@ -223,12 +224,13 @@ seconds(struct timeval *mark)
 #endif
 
 static void
-usage(void)
+usage(int ok)
 {
     static const char *msg[] =
     {
 	"Usage: color_content [options]"
 	,""
+	,USAGE_COMMON
 	,"Options:"
 	," -f COLOR first color value to test (default: 0)"
 	," -i       interactive, showing test-progress"
@@ -244,26 +246,29 @@ usage(void)
     size_t n;
     for (n = 0; n < SIZEOF(msg); n++)
 	fprintf(stderr, "%s\n", msg[n]);
-    ExitProgram(EXIT_FAILURE);
+    ExitProgram(ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }
+/* *INDENT-OFF* */
+VERSION_COMMON()
+/* *INDENT-ON* */
 
 int
-main(int argc GCC_UNUSED, char *argv[]GCC_UNUSED)
+main(int argc, char *argv[])
 {
-    int i;
+    int ch;
 
-    while ((i = getopt(argc, argv, "f:il:npr:sx")) != -1) {
-	switch (i) {
+    while ((ch = getopt(argc, argv, OPTS_COMMON "f:il:npr:sx")) != -1) {
+	switch (ch) {
 	case 'f':
 	    if ((f_opt = atoi(optarg)) <= 0)
-		usage();
+		usage(FALSE);
 	    break;
 	case 'i':
 	    i_opt = 1;
 	    break;
 	case 'l':
 	    if ((l_opt = atoi(optarg)) <= 0)
-		usage();
+		usage(FALSE);
 	    break;
 	case 'n':
 	    n_opt = 1;
@@ -273,7 +278,7 @@ main(int argc GCC_UNUSED, char *argv[]GCC_UNUSED)
 	    break;
 	case 'r':
 	    if ((r_opt = atoi(optarg)) <= 0)
-		usage();
+		usage(FALSE);
 	    break;
 	case 's':
 	    s_opt = 1;
@@ -283,17 +288,22 @@ main(int argc GCC_UNUSED, char *argv[]GCC_UNUSED)
 	    x_opt = 1;
 	    break;
 #endif
+	case OPTS_VERSION:
+	    show_version(argv);
+	    ExitProgram(EXIT_SUCCESS);
 	default:
-	    usage();
+	    usage(ch == OPTS_USAGE);
+	    /* NOTREACHED */
 	}
     }
     if (optind < argc)
-	usage();
+	usage(FALSE);
     if (r_opt <= 0)
 	r_opt = 1;
 
     setup_test();
     if (p_opt) {
+	int i;
 	endwin();
 	for (i = 0; i < COLORS; ++i) {
 	    my_color_t r, g, b;
@@ -327,5 +337,6 @@ main(int argc GCC_UNUSED, char *argv[]GCC_UNUSED)
 	finish_test();
     }
 
+    free(expected);
     ExitProgram(EXIT_SUCCESS);
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2020,2021 Thomas E. Dickey                                *
+ * Copyright 2018-2021,2022 Thomas E. Dickey                                *
  * Copyright 1998-2017,2018 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -30,7 +30,7 @@
 /****************************************************************************
  *  Author: Thomas E. Dickey                    1996-on                     *
  ****************************************************************************/
-/* $Id: test.priv.h,v 1.197 2021/04/25 00:00:24 tom Exp $ */
+/* $Id: test.priv.h,v 1.206 2022/12/04 00:08:15 tom Exp $ */
 
 #ifndef __TEST_PRIV_H
 #define __TEST_PRIV_H 1
@@ -67,16 +67,8 @@
 #define HAVE_ASSUME_DEFAULT_COLORS 0
 #endif
 
-#ifndef HAVE_BSD_STRING_H
-#define HAVE_BSD_STRING_H 0
-#endif
-
-#ifndef HAVE_CURSES_VERSION
-#define HAVE_CURSES_VERSION 0
-#endif
-
-#ifndef HAVE_CURSCR
-#define HAVE_CURSCR 0
+#ifndef HAVE_CFMAKERAW
+#define HAVE_CFMAKERAW 0
 #endif
 
 #ifndef HAVE_CHGAT
@@ -93,6 +85,18 @@
 
 #ifndef HAVE_COLOR_SET
 #define HAVE_COLOR_SET 0
+#endif
+
+#ifndef HAVE_BSD_STRING_H
+#define HAVE_BSD_STRING_H 0
+#endif
+
+#ifndef HAVE_CURSES_VERSION
+#define HAVE_CURSES_VERSION 0
+#endif
+
+#ifndef HAVE_CURSCR
+#define HAVE_CURSCR 0
 #endif
 
 #ifndef HAVE_DELSCREEN
@@ -121,6 +125,10 @@
 
 #ifndef HAVE_GETMAXX
 #define HAVE_GETMAXX 0
+#endif
+
+#ifndef HAVE_GETTIMEOFDAY
+#define HAVE_GETTIMEOFDAY 0
 #endif
 
 #ifndef HAVE_GETOPT_H
@@ -161,6 +169,10 @@
 
 #ifndef HAVE_LOCALE_H
 #define HAVE_LOCALE_H 0
+#endif
+
+#ifndef HAVE_MATH_FUNCS
+#define HAVE_MATH_FUNCS 0
 #endif
 
 #ifndef HAVE_MATH_H
@@ -301,6 +313,10 @@
 
 #ifndef HAVE_WINSSTR
 #define HAVE_WINSSTR 0
+#endif
+
+#ifndef HAVE_UNGET_WCH
+#define HAVE_UNGET_WCH 0
 #endif
 
 #ifndef HAVE_USE_DEFAULT_COLORS
@@ -549,8 +565,12 @@ extern int optind;
 /* workaround, to build against NetBSD's variant of the form library */
 #ifdef HAVE_NETBSD_FORM_H
 #define form_getyx(form, y, x) y = (int)current_field(form)->cursor_ypos, x = (int)current_field(form)->cursor_xpos
-#else
+#define form_field_row(field) (field)->form_row
+#define form_field_col(field) (field)->form_col
+#else /* e.g., SVr4, ncurses */
 #define form_getyx(form, y, x) y = (int)(form)->currow, x = (int)(form)->curcol
+#define form_field_row(field) (field)->frow
+#define form_field_col(field) (field)->fcol
 #endif
 
 /* workaround, to build against NetBSD's variant of the form library */
@@ -695,6 +715,44 @@ extern int optind;
 #define HELP_KEY_1	'?'
 #define HELP_KEY_2	KEY_F(1)
 
+/* our "standard" options for getopt, needed for help2man */
+#define OPTS_USAGE	'h'
+#define OPTS_VERSION	'V'
+#define OPTS_COMMON	"hV"
+#define USAGE_COMMON	\
+ "Common options:"\
+," -h       show this message"\
+," -V       show version of curses"
+
+#if HAVE_CURSES_VERSION
+#define format_version(buffer) strcpy(buffer, curses_version())
+#elif defined(NCURSES_VERSION_MAJOR) && defined(NCURSES_VERSION_MINOR) && defined(NCURSES_VERSION_PATCH)
+#define format_version(buffer) sprintf(buffer, "ncurses %d.%d.%d", \
+	NCURSES_VERSION_MAJOR, \
+	NCURSES_VERSION_MINOR, \
+	NCURSES_VERSION_PATCH)
+#else
+#define format_version(buffer) strcpy(buffer, "ncurses-examples")
+#endif
+
+#define VERSION_COMMON() \
+static char *version_common(char **argv) { \
+	char *base = argv[0]; \
+	char *leaf = strrchr(base, '/'); \
+	char *result = malloc(strlen(base) + 80); \
+	if (leaf++ == NULL) leaf = base; \
+	sprintf(result, "%.20s: ", leaf); \
+	format_version(result + strlen(result)); \
+	return result; \
+} \
+static void show_version(char **argv) { \
+	char *value = version_common(argv); \
+	if (value != NULL) { \
+	    puts(value); \
+	    free(value); \
+	} \
+}
+
 /* from nc_string.h, to make this stand alone */
 #if HAVE_BSD_STRING_H
 #include <bsd/string.h>
@@ -718,8 +776,16 @@ extern int optind;
 #define HAVE_SNPRINTF 0
 #endif
 
+#ifndef HAVE_STRDUP
+#define HAVE_STRDUP 0
+#endif
+
 #ifndef USE_STRING_HACKS
 #define USE_STRING_HACKS 0
+#endif
+
+#ifndef HAVE_STRSTR
+#define HAVE_STRSTR 0
 #endif
 
 #ifndef NCURSES_CAST
@@ -924,7 +990,7 @@ extern int TABSIZE;
 
 #if defined(NCURSES_VERSION) && HAVE_NC_ALLOC_H
 #include <nc_alloc.h>
-#if HAVE_EXIT_TERMINFO && (defined(USE_TERMINFO) || defined(USE_TINFO))
+#if HAVE_EXIT_TERMINFO && !defined(USE_CURSES) && (defined(USE_TERMINFO) || defined(USE_TINFO))
 #undef ExitProgram
 #define ExitProgram(code) exit_terminfo(code)
 #elif HAVE_EXIT_CURSES
@@ -1148,6 +1214,14 @@ extern char *tgoto(char *, int, int);	/* available, but not prototyped */
 #define CONST_MENUS		/* nothing */
 #endif
 
+#if defined(NCURSES_CONST)
+#define CONST_FMT NCURSES_CONST
+#elif defined(PDCURSES)
+#define CONST_FMT const
+#else
+#define CONST_FMT		/* nothing */
+#endif
+
 /*
  * Simplify setting up demo of threading with these macros.
  */
@@ -1172,7 +1246,7 @@ extern char *tgoto(char *, int, int);	/* available, but not prototyped */
 #define WANT_USE_SCREEN() extern void _nc_want_use_screen(void)
 #endif
 
-#if defined(TRACE) && HAVE__TRACEF
+#if defined(TRACE) && HAVE__TRACEF && HAVE_CURSES_TRACE
 #define Trace(p) _tracef p
 #define USE_TRACE 1
 #define START_TRACE() \

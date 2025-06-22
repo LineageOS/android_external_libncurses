@@ -1,6 +1,6 @@
 <!--
   ****************************************************************************
-  * Copyright 2018-2020,2021 Thomas E. Dickey                                *
+  * Copyright 2018-2022,2022 Thomas E. Dickey                                *
   * Copyright 1998-2017,2018 Free Software Foundation, Inc.                  *
   *                                                                          *
   * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,7 +27,7 @@
   * sale, use or other dealings in this Software without prior written       *
   * authorization.                                                           *
   ****************************************************************************
-  * @Id: curs_termcap.3x,v 1.49 2021/04/03 21:17:09 tom Exp @
+  * @Id: curs_termcap.3x,v 1.56 2022/02/12 20:05:11 tom Exp @
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <HTML>
@@ -36,7 +36,7 @@
 <meta name="generator" content="Manpage converted by man2html - see https://invisible-island.net/scripts/readme.html#others_scripts">
 <TITLE>curs_termcap 3x</TITLE>
 <link rel="author" href="mailto:bug-ncurses@gnu.org">
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
 </HEAD>
 <BODY>
 <H1 class="no-header">curs_termcap 3x</H1>
@@ -76,7 +76,7 @@
        been compiled.
 
 
-</PRE><H3><a name="h3-INITIALIZATION">INITIALIZATION</a></H3><PRE>
+</PRE><H3><a name="h3-Initialization">Initialization</a></H3><PRE>
        The <STRONG>tgetent</STRONG> routine loads the entry for <EM>name</EM>.  It returns:
 
           1  on success,
@@ -100,7 +100,7 @@
               ing.
 
 
-</PRE><H3><a name="h3-CAPABILITY-VALUES">CAPABILITY VALUES</a></H3><PRE>
+</PRE><H3><a name="h3-Capability-Values">Capability Values</a></H3><PRE>
        The <STRONG>tgetflag</STRONG> routine gets the boolean entry for <EM>id</EM>, or zero  if  it  is
        not available.
 
@@ -129,12 +129,12 @@
        and <STRONG>tgetstr</STRONG> are compared in lookups.
 
 
-</PRE><H3><a name="h3-FORMATTING-CAPABILITIES">FORMATTING CAPABILITIES</a></H3><PRE>
+</PRE><H3><a name="h3-Formatting-Capabilities">Formatting Capabilities</a></H3><PRE>
        The <STRONG>tgoto</STRONG> routine expands the given capability using the parameters.
 
        <STRONG>o</STRONG>   Because  the  capability may have padding characters, the output of
            <STRONG>tgoto</STRONG> should be passed to <STRONG>tputs</STRONG> rather than some other output func-
-           tion such as <STRONG>printf</STRONG>.
+           tion such as <STRONG>printf(3)</STRONG>.
 
        <STRONG>o</STRONG>   While  <STRONG>tgoto</STRONG> is assumed to be used for the two-parameter cursor po-
            sitioning capability, termcap applications also use it for  single-
@@ -157,12 +157,35 @@
        It can retrieve capabilities by either termcap or terminfo name.
 
 
-</PRE><H3><a name="h3-GLOBAL-VARIABLES">GLOBAL VARIABLES</a></H3><PRE>
+</PRE><H3><a name="h3-Global-Variables">Global Variables</a></H3><PRE>
        The  variables <STRONG>PC</STRONG>, <STRONG>UP</STRONG> and <STRONG>BC</STRONG> are set by <STRONG>tgetent</STRONG> to the terminfo entry's
        data for <STRONG>pad_char</STRONG>, <STRONG>cursor_up</STRONG> and <STRONG>backspace_if_not_bs</STRONG>, respectively.  <STRONG>UP</STRONG>
        is  not used by ncurses.  <STRONG>PC</STRONG> is used in the <STRONG>tdelay_output</STRONG> function.  <STRONG>BC</STRONG>
        is used in the <STRONG>tgoto</STRONG> emulation.  The variable <STRONG>ospeed</STRONG> is set by  ncurses
        in a system-specific coding to reflect the terminal speed.
+
+
+</PRE><H3><a name="h3-Releasing-Memory">Releasing Memory</a></H3><PRE>
+       The  termcap  functions  provide  no  means for freeing memory, because
+       legacy termcap implementations used only the buffer areas  provided  by
+       the  caller  via <STRONG>tgetent</STRONG> and <STRONG>tgetstr</STRONG>.  Those buffers are unused in ter-
+       minfo.
+
+       On the other hand, terminfo allocates memory.  It uses <STRONG>setupterm</STRONG> to re-
+       trieve the data used by <STRONG>tgetent</STRONG> and the functions which return capabil-
+       ity values such as <STRONG>tgetstr</STRONG>.  One could use
+
+            <STRONG>del_curterm(cur_term);</STRONG>
+
+
+       to free this memory, but  there  is  an  additional  complication  with
+       ncurses.   It uses a fixed-size <EM>pool</EM> of storage locations, one per set-
+       ting of the <STRONG>TERM</STRONG> variable when <STRONG>tgetent</STRONG> is called.  The  <STRONG>screen(1)</STRONG>  pro-
+       gram relies upon this arrangement, to improve its performance.
+
+       An  application  which  uses only the low-level termcap functions could
+       free the memory using <STRONG>del_curterm</STRONG>, because the pool is freed using oth-
+       er functions (see <STRONG><A HREF="curs_memleaks.3x.html">curs_memleaks(3x)</A></STRONG>).
 
 
 </PRE><H2><a name="h2-RETURN-VALUE">RETURN VALUE</a></H2><PRE>
@@ -268,7 +291,7 @@
        was written several years before C was  standardized.   However,  there
        were two different termcap.h header files in the BSD sources:
 
-       <STRONG>o</STRONG>   One  was used internally by the <EM>jove</EM> editor in 2BSD through 4.4BSD.
+       <STRONG>o</STRONG>   One  was used internally by the <STRONG>jove</STRONG> editor in 2BSD through 4.4BSD.
            It defined global symbols for the termcap variables which it used.
 
        <STRONG>o</STRONG>   The other appeared in 4.4BSD Lite Release 2 (mid-1993) as  part  of
@@ -290,12 +313,12 @@
        that instance, it was <EM>libedit</EM> which differed from BSD termcap.
 
        A copy of GNU termcap 1.3 was bundled with <EM>bash</EM> in mid-1993, to support
-       the <EM>readline</EM> library.
+       the <STRONG>readline(3)</STRONG> library.
 
        A  termcap.h  file was provided in ncurses 1.8.1 (November 1993).  That
-       reflected influence by <EM>emacs</EM> (rather than <EM>jove</EM>) and GNU termcap:
+       reflected influence by <STRONG>emacs(1)</STRONG> (rather than <STRONG>jove(1)</STRONG>) and GNU termcap:
 
-       <STRONG>o</STRONG>   it provided declarations for a few global symbols used by <EM>emacs</EM>
+       <STRONG>o</STRONG>   it provided declarations for a few global symbols used by <STRONG>emacs</STRONG>
 
        <STRONG>o</STRONG>   it provided function prototypes (using <STRONG>const</STRONG>).
 
@@ -322,10 +345,11 @@
 <li><a href="#h2-SYNOPSIS">SYNOPSIS</a></li>
 <li><a href="#h2-DESCRIPTION">DESCRIPTION</a>
 <ul>
-<li><a href="#h3-INITIALIZATION">INITIALIZATION</a></li>
-<li><a href="#h3-CAPABILITY-VALUES">CAPABILITY VALUES</a></li>
-<li><a href="#h3-FORMATTING-CAPABILITIES">FORMATTING CAPABILITIES</a></li>
-<li><a href="#h3-GLOBAL-VARIABLES">GLOBAL VARIABLES</a></li>
+<li><a href="#h3-Initialization">Initialization</a></li>
+<li><a href="#h3-Capability-Values">Capability Values</a></li>
+<li><a href="#h3-Formatting-Capabilities">Formatting Capabilities</a></li>
+<li><a href="#h3-Global-Variables">Global Variables</a></li>
+<li><a href="#h3-Releasing-Memory">Releasing Memory</a></li>
 </ul>
 </li>
 <li><a href="#h2-RETURN-VALUE">RETURN VALUE</a></li>
