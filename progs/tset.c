@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2020,2021 Thomas E. Dickey                                     *
+ * Copyright 2020-2021,2024 Thomas E. Dickey                                *
  * Copyright 1998-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -98,7 +98,7 @@
 char *ttyname(int fd);
 #endif
 
-MODULE_ID("$Id: tset.c,v 1.131 2021/12/04 23:02:13 tom Exp $")
+MODULE_ID("$Id: tset.c,v 1.135 2024/04/20 22:20:41 tom Exp $")
 
 #ifndef environ
 extern char **environ;
@@ -869,7 +869,11 @@ main(int argc, char **argv)
     if (!noset) {
 #if HAVE_SIZECHANGE
 	if (opt_w) {
-	    set_window_size(my_fd, &lines, &columns);
+	    NCURSES_INT2 my_rows = lines;
+	    NCURSES_INT2 my_cols = columns;
+	    set_window_size(my_fd, &my_rows, &my_cols);
+	    lines = my_rows;
+	    columns = my_cols;
 	}
 #endif
 	if (opt_c) {
@@ -878,9 +882,13 @@ main(int argc, char **argv)
 
 	    if (!noinit) {
 		if (send_init_strings(my_fd, &oldmode)) {
+		    const char *name;
+
 		    (void) putc('\r', stderr);
 		    (void) fflush(stderr);
-		    (void) napms(1000);		/* Settle the terminal. */
+		    if (IsRealTty(my_fd, name)) {
+			(void) napms(1000);	/* Settle the terminal. */
+		    }
 		}
 	    }
 

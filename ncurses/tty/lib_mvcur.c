@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2022,2023 Thomas E. Dickey                                *
  * Copyright 1998-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -160,7 +160,7 @@
 #define CUR SP_TERMTYPE
 #endif
 
-MODULE_ID("$Id: lib_mvcur.c,v 1.157 2022/08/20 18:28:58 tom Exp $")
+MODULE_ID("$Id: lib_mvcur.c,v 1.161 2023/09/16 16:29:02 tom Exp $")
 
 #define WANT_CHAR(sp, y, x) NewScreen(sp)->_line[y].text[x]	/* desired state */
 
@@ -232,14 +232,33 @@ NCURSES_SP_NAME(_nc_msec_cost) (NCURSES_SP_DCLx const char *const cap, int affcn
 	    /* extract padding, either mandatory or required */
 	    if (cp[0] == '$' && cp[1] == '<' && strchr(cp, '>')) {
 		float number = 0.0;
+		int state = 0;
 
 		for (cp += 2; *cp != '>'; cp++) {
-		    if (isdigit(UChar(*cp)))
-			number = number * 10 + (float) (*cp - '0');
-		    else if (*cp == '*')
-			number *= (float) affcnt;
-		    else if (*cp == '.' && (*++cp != '>') && isdigit(UChar(*cp)))
-			number += (float) ((*cp - '0') / 10.0);
+		    if (isdigit(UChar(*cp))) {
+			switch (state) {
+			case 0:
+			    number = number * 10 + (float) (*cp - '0');
+			    break;
+			case 2:
+			    number += (float) ((*cp - '0') / 10.0);
+			    ++state;
+			    break;
+			}
+		    } else if (*cp == '*') {
+			/* padding is always a suffix */
+			if (state < 4) {
+			    number *= (float) affcnt;
+			    state = 4;
+			}
+		    } else if (*cp == '.') {
+			/* a single decimal point is allowed */
+			state = (state == 0) ? 2 : 3;
+		    }
+		    if (number > MAX_DELAY_MSECS) {
+			number = MAX_DELAY_MSECS;
+			break;
+		    }
 		}
 
 #if NCURSES_NO_PADDING
@@ -432,8 +451,8 @@ NCURSES_SP_NAME(_nc_mvcur_init) (NCURSES_SP_DCL0)
 					   1);
     SP_PARM->_hpa_ch_cost = NormalizedCost(TIPARM_1(column_address, 23), 1);
     SP_PARM->_cuf_ch_cost = NormalizedCost(TIPARM_1(parm_right_cursor, 23), 1);
-    SP_PARM->_inline_cost = min(SP_PARM->_cup_ch_cost,
-				min(SP_PARM->_hpa_ch_cost,
+    SP_PARM->_inline_cost = Min(SP_PARM->_cup_ch_cost,
+				Min(SP_PARM->_hpa_ch_cost,
 				    SP_PARM->_cuf_ch_cost));
 
     /*
@@ -675,7 +694,7 @@ relative_move(NCURSES_SP_DCLx
 		 * and the time the structure WANT_CHAR would access has been
 		 * updated.
 		 */
-		if (ovw) {
+		if (ovw && to_y >= 0) {
 		    int i;
 
 		    for (i = 0; i < n; i++) {
@@ -690,7 +709,7 @@ relative_move(NCURSES_SP_DCLx
 			}
 		    }
 		}
-		if (ovw) {
+		if (ovw && to_y >= 0) {
 		    int i;
 
 		    for (i = 0; i < n; i++)

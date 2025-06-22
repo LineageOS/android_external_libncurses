@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2023,2024 Thomas E. Dickey                                *
  * Copyright 1998-2017,2018 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -49,7 +49,7 @@
 #include <parametrized.h>
 #include <transform.h>
 
-MODULE_ID("$Id: tic.c,v 1.320 2022/09/17 18:55:28 tom Exp $")
+MODULE_ID("$Id: tic.c,v 1.325 2024/03/02 19:33:22 tom Exp $")
 
 #define STDIN_NAME "<stdin>"
 
@@ -459,17 +459,20 @@ open_input(const char *filename, char *alt_file)
     if (!strcmp(filename, "-")) {
 	fp = copy_input(stdin, STDIN_NAME, alt_file);
     } else if (stat(filename, &sb) == -1) {
-	fprintf(stderr, "%s: %s %s\n", _nc_progname, filename, strerror(errno));
+	fprintf(stderr, "%s: cannot open '%s': %s\n", _nc_progname,
+		filename, strerror(errno));
 	ExitProgram(EXIT_FAILURE);
     } else if ((mode = (sb.st_mode & S_IFMT)) == S_IFDIR
 	       || (mode != S_IFREG && mode != S_IFCHR && mode != S_IFIFO)) {
-	fprintf(stderr, "%s: %s is not a file\n", _nc_progname, filename);
+	fprintf(stderr, "%s: cannot open '%s'; it is not a file\n",
+		_nc_progname, filename);
 	ExitProgram(EXIT_FAILURE);
     } else {
 	fp = safe_fopen(filename, "r");
 
 	if (fp == NULL) {
-	    fprintf(stderr, "%s: Can't open %s\n", _nc_progname, filename);
+	    fprintf(stderr, "%s: cannot open '%s': %s\n", _nc_progname,
+		    filename, strerror(errno));
 	    ExitProgram(EXIT_FAILURE);
 	}
 	if (mode != S_IFREG) {
@@ -477,7 +480,8 @@ open_input(const char *filename, char *alt_file)
 		FILE *fp2 = copy_input(fp, filename, alt_file);
 		fp = fp2;
 	    } else {
-		fprintf(stderr, "%s: %s is not a file\n", _nc_progname, filename);
+		fprintf(stderr, "%s: cannot open '%s'; it is not a"
+			" file\n", _nc_progname, filename);
 		ExitProgram(EXIT_FAILURE);
 	    }
 	}
@@ -700,7 +704,7 @@ main(int argc, char *argv[])
     bool forceresolve = FALSE;	/* force resolution */
     bool limited = TRUE;
     char *tversion = (char *) NULL;
-    const char *source_file = "terminfo";
+    const char *source_file;
     char *outdir = (char *) NULL;
     bool check_only = FALSE;
     bool suppress_untranslatable = FALSE;
@@ -1169,6 +1173,7 @@ check_acs(TERMTYPE2 *tp)
 	char *q;
 
 	memset(mapped, 0, sizeof(mapped));
+	memset(missing, 0, sizeof(missing));
 	for (p = acs_chars; *p != '\0'; p += 2) {
 	    if (p[1] == '\0') {
 		_nc_warning("acsc has odd number of characters");
@@ -1350,8 +1355,7 @@ check_ansi_cursor(char *list[4])
     for (j = 0; j < 4; ++j) {
 	skip[j] = FALSE;
 	for (k = 0; k < j; ++k) {
-	    if (j != k
-		&& !strcmp(list[j], list[k])) {
+	    if (!strcmp(list[j], list[k])) {
 		char *value = _nc_tic_expand(list[k], TRUE, 0);
 		_nc_warning("repeated cursor control %s", value);
 		repeated = TRUE;
@@ -2270,8 +2274,14 @@ check_1_infotocap(const char *name, NCURSES_CONST char *value, int count)
 
     _nc_reset_tparm(NULL);
     switch (actual) {
+    case Str:
+	result = TPARM_1(value, strings[1]);
+	break;
     case Num_Str:
 	result = TPARM_2(value, numbers[1], strings[2]);
+	break;
+    case Str_Str:
+	result = TPARM_2(value, strings[1], strings[2]);
 	break;
     case Num_Str_Str:
 	result = TPARM_3(value, numbers[1], strings[2], strings[3]);
@@ -2434,60 +2444,63 @@ static void
 check_infotocap(TERMTYPE2 *tp, int i, const char *value)
 {
     const char *name = ExtStrname(tp, i, strnames);
-    int params = ((i < (int) SIZEOF(parametrized))
-		  ? parametrized[i]
-		  : ((*value == 'k')
-		     ? 0
-		     : has_params(value, FALSE)));
     char *ti_value = NULL;
-    char *tc_value;
-    bool embedded;
 
     assert(SIZEOF(parametrized) == STRCOUNT);
     if (!VALID_STRING(value) || (ti_value = strdup(value)) == NULL) {
 	_nc_warning("tic-expansion of %s failed", name);
-    } else if ((tc_value = _nc_infotocap(name, ti_value, params)) == ABSENT_STRING) {
-	_nc_warning("tic-conversion of %s failed", name);
-    } else if (params > 0) {
-	int limit = 5;
-	int count;
-	bool first = TRUE;
+    } else {
+	char *tc_value;
+	bool embedded;
+	int params = ((i < (int) SIZEOF(parametrized))
+		      ? parametrized[i]
+		      : ((*value == 'k')
+			 ? 0
+			 : has_params(value, FALSE)));
 
-	if (!strcmp(name, "setf")
-	    || !strcmp(name, "setb")
-	    || !strcmp(name, "setaf")
-	    || !strcmp(name, "setab")) {
-	    if ((limit = max_colors) > 256)
-		limit = 256;
-	}
-	for (count = 0; count < limit; ++count) {
-	    char *ti_check = check_1_infotocap(name, ti_value, count);
-	    char *tc_check = check_1_infotocap(name, tc_value, count);
+	if ((tc_value = _nc_infotocap(name, ti_value, params)) == ABSENT_STRING) {
+	    _nc_warning("tic-conversion of %s failed", name);
+	} else if (params > 0) {
+	    int limit = 5;
+	    int count;
+	    bool first = TRUE;
 
-	    if (strcmp(ti_check, tc_check)) {
-		if (first) {
-		    fprintf(stderr, "check_infotocap(%s)\n", name);
-		    fprintf(stderr, "...ti '%s'\n", _nc_visbuf2(0, ti_value));
-		    fprintf(stderr, "...tc '%s'\n", _nc_visbuf2(0, tc_value));
-		    first = FALSE;
-		}
-		_nc_warning("tparm-conversion of %s(%d) differs between\n\tterminfo %s\n\ttermcap  %s",
-			    name, count,
-			    _nc_visbuf2(0, ti_check),
-			    _nc_visbuf2(1, tc_check));
+	    if (!strcmp(name, "setf")
+		|| !strcmp(name, "setb")
+		|| !strcmp(name, "setaf")
+		|| !strcmp(name, "setab")) {
+		if ((limit = max_colors) > 256)
+		    limit = 256;
 	    }
-	    free(ti_check);
-	    free(tc_check);
+	    for (count = 0; count < limit; ++count) {
+		char *ti_check = check_1_infotocap(name, ti_value, count);
+		char *tc_check = check_1_infotocap(name, tc_value, count);
+
+		if (strcmp(ti_check, tc_check)) {
+		    if (first) {
+			fprintf(stderr, "check_infotocap(%s)\n", name);
+			fprintf(stderr, "...ti '%s'\n", _nc_visbuf2(0, ti_value));
+			fprintf(stderr, "...tc '%s'\n", _nc_visbuf2(0, tc_value));
+			first = FALSE;
+		    }
+		    _nc_warning("tparm-conversion of %s(%d) differs between\n\tterminfo %s\n\ttermcap  %s",
+				name, count,
+				_nc_visbuf2(0, ti_check),
+				_nc_visbuf2(1, tc_check));
+		}
+		free(ti_check);
+		free(tc_check);
+	    }
+	} else if (params == 0 && !same_ti_tc(ti_value, tc_value, &embedded)) {
+	    if (embedded) {
+		_nc_warning("termcap equivalent of %s cannot use embedded delay", name);
+	    } else {
+		_nc_warning("tic-conversion of %s changed value\n\tfrom %s\n\tto   %s",
+			    name, ti_value, tc_value);
+	    }
 	}
-    } else if (params == 0 && !same_ti_tc(ti_value, tc_value, &embedded)) {
-	if (embedded) {
-	    _nc_warning("termcap equivalent of %s cannot use embedded delay", name);
-	} else {
-	    _nc_warning("tic-conversion of %s changed value\n\tfrom %s\n\tto   %s",
-			name, ti_value, tc_value);
-	}
+	free(ti_value);
     }
-    free(ti_value);
 }
 
 static char *
@@ -3136,6 +3149,7 @@ guess_ANSI_VTxx(TERMTYPE2 *tp)
  * In particular, any ECMA-48 terminal should support these, though the details
  * for u9 are implementation dependent.
  */
+#if defined(user6) && defined(user7) && defined(user8) && defined(user9)
 static void
 check_user_6789(TERMTYPE2 *tp)
 {
@@ -3171,6 +3185,9 @@ check_user_6789(TERMTYPE2 *tp)
 	break;
     }
 }
+#else
+#define check_user_6789(tp)	/* nothing */
+#endif
 
 /* other sanity-checks (things that we don't want in the normal
  * logic that reads a terminfo entry)

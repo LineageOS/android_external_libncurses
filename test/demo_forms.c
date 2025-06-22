@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2020,2022 Thomas E. Dickey                                *
+ * Copyright 2018-2022,2023 Thomas E. Dickey                                *
  * Copyright 2003-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,7 +27,7 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: demo_forms.c,v 1.61 2022/12/04 00:40:11 tom Exp $
+ * $Id: demo_forms.c,v 1.63 2023/11/11 00:29:53 tom Exp $
  *
  * Demonstrate a variety of functions from the form library.
  * Thomas Dickey - 2003/4/26
@@ -154,7 +154,7 @@ make_label(const char *label, int frow, int fcol)
 
     if (f) {
 	set_field_buffer(f, 0, label);
-	set_field_opts(f, (int) ((unsigned) field_opts(f) & ~O_ACTIVE));
+	set_field_opts(f, (int) ((unsigned) field_opts(f) & (unsigned) ~O_ACTIVE));
     }
     return (f);
 }
@@ -242,7 +242,7 @@ show_insert_mode(bool insert_mode)
 #define O_SELECTABLE (O_ACTIVE | O_VISIBLE)
 
 static FIELD *
-another_field(FORM *form, FIELD *field)
+another_field(FORM *form, const FIELD *const field)
 {
     FIELD **f = form_fields(form);
     FIELD *result = 0;

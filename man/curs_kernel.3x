@@ -1,5 +1,5 @@
 .\"***************************************************************************
-.\" Copyright 2018-2021,2022 Thomas E. Dickey                                *
+.\" Copyright 2018-2023,2024 Thomas E. Dickey                                *
 .\" Copyright 1998-2016,2017 Free Software Foundation, Inc.                  *
 .\"                                                                          *
 .\" Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,87 +27,83 @@
 .\" authorization.                                                           *
 .\"***************************************************************************
 .\"
-.\" $Id: curs_kernel.3x,v 1.32 2022/02/12 20:05:11 tom Exp $
-.ie \n(.g .ds `` \(lq
-.el       .ds `` ``
-.ie \n(.g .ds '' \(rq
-.el       .ds '' ''
+.\" $Id: curs_kernel.3x,v 1.61 2024/04/20 21:24:19 tom Exp $
+.TH curs_kernel 3X 2024-04-20 "ncurses @NCURSES_MAJOR@.@NCURSES_MINOR@" "Library calls"
+.ie \n(.g \{\
+.ds `` \(lq
+.ds '' \(rq
+.\}
+.el \{\
+.ie t .ds `` ``
+.el   .ds `` ""
+.ie t .ds '' ''
+.el   .ds '' ""
+.\}
+.
 .de bP
 .ie n  .IP \(bu 4
 .el    .IP \(bu 2
 ..
-.TH curs_kernel 3X ""
-.na
-.hy 0
 .SH NAME
-\fBdef_prog_mode\fP,
-\fBdef_shell_mode\fP,
-\fBreset_prog_mode\fP,
-\fBreset_shell_mode\fP,
-\fBresetty\fP,
-\fBsavetty\fP,
-\fBgetsyx\fP,
-\fBsetsyx\fP,
-\fBripoffline\fP,
-\fBcurs_set\fP,
-\fBnapms\fP \- low-level \fBcurses\fP routines
-.ad
-.hy
+\fB\%def_prog_mode\fP,
+\fB\%def_shell_mode\fP,
+\fB\%reset_prog_mode\fP,
+\fB\%reset_shell_mode\fP,
+\fB\%resetty\fP,
+\fB\%savetty\fP,
+\fB\%getsyx\fP,
+\fB\%setsyx\fP,
+\fB\%ripoffline\fP,
+\fB\%curs_set\fP,
+\fB\%napms\fP \-
+low-level \fIcurses\fR routines
 .SH SYNOPSIS
-\fB#include <curses.h>\fP
-.sp
-\fBint def_prog_mode(void);\fP
-.br
-\fBint def_shell_mode(void);\fP
-.sp
-\fBint reset_prog_mode(void);\fP
-.br
-\fBint reset_shell_mode(void);\fP
-.sp
-\fBint resetty(void);\fP
-.br
-\fBint savetty(void);\fP
-.sp
-\fBvoid getsyx(int \fIy\fB, int \fIx\fB);\fR
-.br
-\fBvoid setsyx(int \fIy\fB, int \fIx\fB);\fR
-.sp
-\fBint ripoffline(int \fIline\fB, int (*\fIinit\fB)(WINDOW *, int));\fR
-.br
-\fBint curs_set(int \fIvisibility\fB);\fR
-.br
-\fBint napms(int \fIms\fB);\fR
-.br
+.nf
+\fB#include <curses.h>
+.PP
+\fBint def_prog_mode(void);
+\fBint def_shell_mode(void);
+.PP
+\fBint reset_prog_mode(void);
+\fBint reset_shell_mode(void);
+.PP
+\fBint resetty(void);
+\fBint savetty(void);
+.PP
+\fBvoid getsyx(int \fIy\fP, int \fIx\fP);
+\fBvoid setsyx(int \fIy\fP, int \fIx\fP);
+.PP
+\fBint ripoffline(int \fIline\fP, int (*\fIinit\fP)(WINDOW *, int));
+\fBint curs_set(int \fIvisibility\fP);
+\fBint napms(int \fIms\fP);
+.fi
 .SH DESCRIPTION
 The following routines give low-level access
 to various \fBcurses\fP capabilities.
 These routines typically are used inside library routines.
-.SS def_prog_mode, def_shell_mode
-.PP
+.SS "def_prog_mode, def_shell_mode"
 The \fBdef_prog_mode\fP and \fBdef_shell_mode\fP routines save the
-current terminal modes as the \*(``program\*('' (in \fBcurses\fP) or \*(``shell\*(''
+current terminal modes as the \*(``program\*(''
+(in \fBcurses\fP) or \*(``shell\*(''
 (not in \fBcurses\fP) state for use by the \fBreset_prog_mode\fP and
 \fBreset_shell_mode\fP routines.
 This is done automatically by \fBinitscr\fP.
 There is one such save area for each screen context
 allocated by \fBnewterm\fP.
-.SS reset_prog_mode, reset_shell_mode
-.PP
+.SS "reset_prog_mode, reset_shell_mode"
 The \fBreset_prog_mode\fP and \fBreset_shell_mode\fP routines restore
 the terminal to \*(``program\*('' (in \fBcurses\fP) or \*(``shell\*('' (out of
 \fBcurses\fP) state.
 These are done automatically by \fBendwin\fP(3X) and,
 after an \fBendwin\fP, by \fBdoupdate\fP,
 so they normally are not called.
-.SS resetty, savetty
-.PP
+.SS "resetty, savetty"
 The \fBresetty\fP and \fBsavetty\fP routines save and restore the
 state of the terminal modes.
 \fBsavetty\fP saves the current state in
 a buffer and \fBresetty\fP restores the state to what it was at the
 last call to \fBsavetty\fP.
 .SS getsyx
-.PP
 The \fBgetsyx\fP routine returns the current coordinates
 of the \fIvirtual screen\fP cursor in \fIy\fP and \fIx\fP.
 If \fBleaveok\fP is currently \fBTRUE\fP, then
@@ -120,7 +116,6 @@ therefore, \fIy\fP and \fIx\fP should be used only as arguments for
 Few applications will use this feature,
 most use \fBgetyx\fP instead.
 .SS setsyx
-.PP
 The \fBsetsyx\fP routine sets
 the \fIvirtual screen\fP cursor to \fIy\fP, \fIx\fP.
 If \fIy\fP and \fIx\fP are both \fB\-1\fP, then
@@ -137,11 +132,10 @@ at the beginning, do its manipulation of its own windows, do a
 Few applications will use this feature,
 most use \fBwmove\fP instead.
 .SS ripoffline
-.PP
-The \fBripoffline\fP routine provides access to the same facility that
-\fBslk_init\fP [see \fBcurs_slk\fP(3X)] uses to reduce the size of the
-screen.
-\fBripoffline\fP must be called before \fBinitscr\fP or
+.B \%ripoffline
+provides access to the same facility that \fB\%slk_init\fP(3X) uses to
+reduce the size of the screen.
+\fB\%ripoffline\fP must be called before \fBinitscr\fP or
 \fBnewterm\fP is called, to prepare these initial actions:
 .bP
 If \fIline\fP is positive, a line is removed from the top of \fBstdscr\fP.
@@ -165,7 +159,6 @@ It is allowable to call \fBwnoutrefresh\fP during the initialization routine.
 \fBripoffline\fP can be called up to five times before calling \fBinitscr\fP or
 \fBnewterm\fP.
 .SS curs_set
-.PP
 The \fBcurs_set\fP routine sets the cursor state to invisible,
 normal, or very visible for \fBvisibility\fP equal to \fB0\fP,
 \fB1\fP, or \fB2\fP respectively.
@@ -173,8 +166,15 @@ If the terminal supports the \fIvisibility\fP requested,
 the previous \fIcursor\fP state is returned;
 otherwise, \fBERR\fP is returned.
 .SS napms
-.PP
-The \fBnapms\fP routine is used to sleep for \fIms\fP milliseconds.
+.B \%napms
+sleeps for
+.I ms
+milliseconds.
+If
+.I ms
+exceeds 30,000
+(thirty seconds),
+it is capped at that value.
 .SH RETURN VALUE
 Except for \fBcurs_set\fP, these routines always return \fBOK\fP.
 .PP
@@ -185,18 +185,14 @@ requested \fIvisibility\fP is not supported.
 X/Open defines no error conditions.
 In this implementation
 .TP 5
-.na
-.hy 0
 \fBdef_prog_mode\fP, \fBdef_shell_mode\fP, \fBreset_prog_mode\fP, \fBreset_shell_mode\fP
-.hy
-.ad
 return an error
 if the terminal was not initialized, or
 if the I/O call to obtain the terminal settings fails.
 .TP 5
 \fBripoffline\fP
 returns an error if the maximum number of ripped-off lines
-exceeds the maximum (NRIPS = 5).
+exceeds the maximum (5).
 .SH NOTES
 Note that \fBgetsyx\fP is a macro, so \fB&\fP is not necessary before
 the variables \fIy\fP and \fIx\fP.
@@ -206,26 +202,30 @@ of \fBcurs_set\fP \*(``is currently incorrect\*(''.
 This implementation gets it right, but it may be unwise to count
 on the correctness of the return value anywhere else.
 .PP
-Both ncurses and SVr4 will call \fBcurs_set\fP in \fBendwin\fP
+Both \fI\%ncurses\fP and SVr4 will call \fBcurs_set\fP in \fBendwin\fP
 if \fBcurs_set\fP
 has been called to make the cursor other than normal, i.e., either
 invisible or very visible.
-There is no way for ncurses to determine the initial cursor state to
-restore that.
+There is no way for \fI\%ncurses\fP to determine the initial cursor
+state to restore that.
 .SH PORTABILITY
 The \fIvirtual screen\fP functions \fBsetsyx\fP and \fBgetsyx\fP
-are not described in the XSI Curses standard, Issue 4.
-All other functions are as described in XSI Curses.
+are not described in X/Open Curses, Issue 4.
+All other functions are as described in X/Open Curses.
 .PP
 The SVr4 documentation describes \fBsetsyx\fP and \fBgetsyx\fP
 as having return type int.
 This is misleading, as they are macros with no documented semantics
 for the return value.
+.PP
+If interrupted, \fI\%ncurses\fP restarts \fBnapms\fP.
+That, and the limitation to 30 seconds,
+are different from other implementations.
 .SH SEE ALSO
-\fBcurses\fP(3X),
-\fBcurs_initscr\fP(3X),
-\fBcurs_outopts\fP(3X),
-\fBcurs_refresh\fP(3X),
-\fBcurs_scr_dump\fP(3X),
-\fBcurs_slk\fP(3X),
-\fBcurs_variables\fP(3X).
+\fB\%curses\fP(3X),
+\fB\%curs_initscr\fP(3X),
+\fB\%curs_outopts\fP(3X),
+\fB\%curs_refresh\fP(3X),
+\fB\%curs_scr_dump\fP(3X),
+\fB\%curs_slk\fP(3X),
+\fB\%curs_variables\fP(3X)

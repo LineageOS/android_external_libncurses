@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2019-2021,2022 Thomas E. Dickey                                *
+ * Copyright 2019-2022,2023 Thomas E. Dickey                                *
  * Copyright 2013-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -728,6 +728,42 @@ int	intrflush(
 		NCURSES_BOOL flag)
 		{ return(*(int *)0); }
 
+#undef is_nl_sp
+int	is_nl_sp(
+		SCREEN	*sp)
+		{ return(*(int *)0); }
+
+#undef is_raw_sp
+int	is_raw_sp(
+		SCREEN	*sp)
+		{ return(*(int *)0); }
+
+#undef is_cbreak_sp
+int	is_cbreak_sp(
+		SCREEN	*sp)
+		{ return(*(int *)0); }
+
+#undef is_echo_sp
+int	is_echo_sp(
+		SCREEN	*sp)
+		{ return(*(int *)0); }
+
+#undef is_nl
+int	is_nl(void)
+		{ return(*(int *)0); }
+
+#undef is_raw
+int	is_raw(void)
+		{ return(*(int *)0); }
+
+#undef is_cbreak
+int	is_cbreak(void)
+		{ return(*(int *)0); }
+
+#undef is_echo
+int	is_echo(void)
+		{ return(*(int *)0); }
+
 /* ./tinfo/lib_setup.c */
 
 #undef _nc_ttytype
@@ -1002,6 +1038,21 @@ char	*tiparm(
 		const char *string,
 		...)
 		{ return(*(char **)0); }
+
+#undef tiparm_s
+char	*tiparm_s(
+		int	num_expected,
+		int	tparm_type,
+		const char *string,
+		...)
+		{ return(*(char **)0); }
+
+#undef tiscan_s
+int	tiscan_s(
+		int	*num_expected,
+		int	*tparm_type,
+		const char *string)
+		{ return(*(int *)0); }
 
 #undef _nc_tiparm
 char	*_nc_tiparm(
@@ -1487,7 +1538,7 @@ string_desc *_nc_str_null(
 #undef _nc_str_copy
 string_desc *_nc_str_copy(
 		string_desc *dst,
-		string_desc *src)
+		const string_desc *const src)
 		{ return(*(string_desc **)0); }
 
 #undef _nc_safe_strcat
