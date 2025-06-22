@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2018-2019,2020 Thomas E. Dickey                                *
+ * Copyright 2018-2020,2021 Thomas E. Dickey                                *
  * Copyright 1998-2017,2018 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -30,7 +30,7 @@
 /****************************************************************************
  *  Author: Thomas E. Dickey                    1996-on                     *
  ****************************************************************************/
-/* $Id: test.priv.h,v 1.185 2020/02/02 23:34:34 tom Exp $ */
+/* $Id: test.priv.h,v 1.197 2021/04/25 00:00:24 tom Exp $ */
 
 #ifndef __TEST_PRIV_H
 #define __TEST_PRIV_H 1
@@ -243,6 +243,10 @@
 #define HAVE_STDINT_H 0
 #endif
 
+#ifndef HAVE_STDNORETURN_H
+#define HAVE_STDNORETURN_H 0
+#endif
+
 #ifndef HAVE_STRSTR
 #define HAVE_STRSTR 0
 #endif
@@ -391,6 +395,16 @@
 #include <curses.h>
 #endif
 
+#if HAVE_STDNORETURN_H && !defined(NCURSES_VERSION)
+#include <stdnoreturn.h>
+#undef GCC_NORETURN
+#define GCC_NORETURN _Noreturn
+#endif
+
+#if !(defined(NCURSES_WGETCH_EVENTS) && defined(NEED_KEY_EVENT))
+#undef KEY_EVENT		/* reduce compiler-warnings with Visual C++ */
+#endif
+
 #if defined(HAVE_XCURSES) || defined(PDCURSES)
 /* no other headers */
 #undef  HAVE_SETUPTERM		/* nonfunctional */
@@ -436,6 +450,13 @@ extern int optind;
 
 #include <assert.h>
 #include <ctype.h>
+
+#if defined(_MSC_VER)
+#undef popen
+#define popen(s,n) _popen(s,n)
+#undef pclose
+#define pclose(s) _pclose(s)
+#endif
 
 #ifndef GCC_NORETURN
 #define GCC_NORETURN		/* nothing */
@@ -727,10 +748,10 @@ extern "C" {
 #endif
 
 #if USE_STRING_HACKS && HAVE_SNPRINTF
-#define _nc_SPRINTF             NCURSES_VOID snprintf
+#define _nc_SPRINTF             NCURSES_VOID (snprintf)
 #define _nc_SLIMIT(n)           NCURSES_CAST(size_t,n),
 #else
-#define _nc_SPRINTF             NCURSES_VOID sprintf
+#define _nc_SPRINTF             NCURSES_VOID (sprintf)
 #define _nc_SLIMIT(n)		/* nothing */
 #endif
 
@@ -903,11 +924,14 @@ extern int TABSIZE;
 
 #if defined(NCURSES_VERSION) && HAVE_NC_ALLOC_H
 #include <nc_alloc.h>
-#if HAVE_NC_FREEALL && defined(USE_TINFO)
+#if HAVE_EXIT_TERMINFO && (defined(USE_TERMINFO) || defined(USE_TINFO))
 #undef ExitProgram
 #define ExitProgram(code) exit_terminfo(code)
+#elif HAVE_EXIT_CURSES
+#undef ExitProgram
+#define ExitProgram(code) exit_curses(code)
 #endif
-#else
+#else /* not ncurses-tree */
 #define typeMalloc(type,n) (type *) malloc((size_t)(n) * sizeof(type))
 #define typeCalloc(type,elts) (type *) calloc((size_t)(elts), sizeof(type))
 #define typeRealloc(type,n,p) (type *) realloc(p, (size_t)(n) * sizeof(type))
@@ -924,7 +948,12 @@ extern int TABSIZE;
 #define EXIT_FAILURE 1
 #endif
 
-#if defined(_WIN32) || defined(USE_WIN32CON_DRIVER)
+#undef _NC_WINDOWS
+#if (defined(_WIN32) || defined(_WIN64))
+#define _NC_WINDOWS 1
+#endif
+
+#if defined(_NC_WINDOWS) || defined(USE_WIN32CON_DRIVER)
 
 #if defined(PDCURSES)
 #ifdef WINVER
@@ -942,12 +971,26 @@ extern int TABSIZE;
 #define SIGKILL 9
 #define getlogin() "username"
 
-#elif defined(HAVE_NCURSESW_NCURSES_H)
+#elif defined(EXP_WIN32_DRIVER)
+
+#if defined(HAVE_NCURSESW_NCURSES_H)
+#include <ncursesw/nc_win32.h>
+#elif defined(HAVE_NCURSES_NCURSES_H)
+#include <ncurses/nc_win32.h>
+#else
+#include <nc_win32.h>
+#endif
+
+#else
+
+#if defined(HAVE_NCURSESW_NCURSES_H)
 #include <ncursesw/nc_mingw.h>
 #elif defined(HAVE_NCURSES_NCURSES_H)
 #include <ncurses/nc_mingw.h>
 #else
 #include <nc_mingw.h>
+#endif
+
 #endif
 
 /* conflicts in test/firstlast.c */
@@ -1020,6 +1063,12 @@ extern char *_nc_strstr(const char *, const char *);
 #define InitAndCatch(init,handler) do { CATCHALL(handler); init; } while (0)
 #else
 #define InitAndCatch(init,handler) do { init; CATCHALL(handler); } while (0)
+#endif
+
+#if defined(_NC_WINDOWS) || defined(USE_WIN32CON_DRIVER)
+#define SetupAlarm(opt)	(void)opt
+#else
+#define SetupAlarm(opt)	if (opt) alarm((unsigned)opt)
 #endif
 
 /*
