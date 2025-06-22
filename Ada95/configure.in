@@ -1,5 +1,5 @@
 dnl***************************************************************************
-dnl Copyright 2018-2020,2021 Thomas E. Dickey                                *
+dnl Copyright 2018-2021,2022 Thomas E. Dickey                                *
 dnl Copyright 2010-2016,2018 Free Software Foundation, Inc.                  *
 dnl                                                                          *
 dnl Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -29,7 +29,7 @@ dnl***************************************************************************
 dnl
 dnl Author: Thomas E. Dickey
 dnl
-dnl $Id: configure.in,v 1.83 2021/07/03 20:23:24 tom Exp $
+dnl $Id: configure.in,v 1.88 2022/12/17 22:05:22 tom Exp $
 dnl Process this file with autoconf to produce a configure script.
 dnl
 dnl For additional information, see
@@ -38,11 +38,13 @@ dnl     https://invisible-island.net/autoconf/my-autoconf.html
 dnl
 dnl ---------------------------------------------------------------------------
 AC_PREREQ(2.52.20210509)
-AC_REVISION($Revision: 1.83 $)
+AC_REVISION($Revision: 1.88 $)
 AC_INIT(gen/gen.c)
 AC_CONFIG_HEADER(include/ncurses_cfg.h:include/ncurses_cfg.hin)
 
 AC_DEFUN([AC_PATH_XTRA],[])dnl ignore dependencies on this
+
+PACKAGE="AdaCurses"		AC_SUBST(PACKAGE)
 
 CF_TOP_BUILDDIR
 
@@ -356,7 +358,7 @@ CF_DISABLE_ECHO
 
 CF_ENABLE_WARNINGS(Wno-unknown-pragmas Wswitch-enum,yes)
 if test "x$enable_warnings" = "xyes"; then
- 	CF_ADD_ADAFLAGS(-gnatg)
+ 	CF_ADD_ADAFLAGS(-gnatwa -gnatyg)
 fi
 
 ###	use option --enable-assertions to turn on generation of assertion code
@@ -419,6 +421,7 @@ CF_DISABLE_GNAT_PROJECTS
 ###	Checks for libraries.
 case $cf_cv_system_name in
 (*mingw32*)
+	CF_CHECK_LIBSSP
 	;;
 (*)
 AC_CHECK_FUNC(gettimeofday,
@@ -587,6 +590,7 @@ AC_OUTPUT( \
 	src/library.gpr:src/library.gpr.in \
 	doc/adacurses${DFT_ARG_SUFFIX}-config.1:doc/MKada_config.in \
 	Makefile,[
+$AWK -v PACKAGE=$PACKAGE -f $srcdir/mk-pkg.awk </dev/null >> Makefile
 if test -z "$USE_OLD_MAKERULES" ; then
 	$AWK -f $srcdir/mk-1st.awk <$srcdir/src/modules >>src/Makefile
 fi
@@ -604,6 +608,7 @@ LN_S="$LN_S"
 NCURSES_MAJOR="$NCURSES_MAJOR"
 NCURSES_MINOR="$NCURSES_MINOR"
 NCURSES_PATCH="$NCURSES_PATCH"
+PACKAGE="$PACKAGE"
 USE_OLD_MAKERULES="$USE_OLD_MAKERULES"
 cf_cv_VERSION_GNATMAKE=$cf_cv_VERSION_GNATMAKE
 cf_cv_VERSION_GPRBUILD=$cf_cv_VERSION_GPRBUILD

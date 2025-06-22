@@ -1,5 +1,5 @@
 dnl***************************************************************************
-dnl Copyright 2018-2020,2021 Thomas E. Dickey                                *
+dnl Copyright 2018-2021,2022 Thomas E. Dickey                                *
 dnl Copyright 2010-2017,2018 Free Software Foundation, Inc.                  *
 dnl                                                                          *
 dnl Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -29,7 +29,7 @@ dnl***************************************************************************
 dnl
 dnl Author: Thomas E. Dickey
 dnl
-dnl $Id: aclocal.m4,v 1.185 2021/10/17 15:16:03 tom Exp $
+dnl $Id: aclocal.m4,v 1.196 2022/10/02 23:55:56 tom Exp $
 dnl Macros used in NCURSES Ada95 auto-configuration script.
 dnl
 dnl These macros are maintained separately from NCURSES.  The copyright on
@@ -477,7 +477,7 @@ fi
 AC_SUBST(ARFLAGS)
 ])
 dnl ---------------------------------------------------------------------------
-dnl CF_BUILD_CC version: 9 updated: 2021/01/02 09:31:20
+dnl CF_BUILD_CC version: 10 updated: 2022/09/24 16:36:41
 dnl -----------
 dnl If we're cross-compiling, allow the user to override the tools and their
 dnl options.  The configure script is oriented toward identifying the host
@@ -543,7 +543,30 @@ if test "$cross_compiling" = yes ; then
 
 	: ${BUILD_CC:='${CC}'}
 
-	if { test "$BUILD_CC" = "$CC" || test "$BUILD_CC" = '${CC}'; } ; then
+	AC_MSG_CHECKING(if the build-compiler "$BUILD_CC" works)
+
+	cf_save_crossed=$cross_compiling
+	cf_save_ac_link=$ac_link
+	cross_compiling=no
+	ac_link='$BUILD_CC -o "conftest$ac_exeext" $BUILD_CFLAGS $BUILD_CPPFLAGS $BUILD_LDFLAGS "conftest.$ac_ext" $BUILD_LIBS >&AS_MESSAGE_LOG_FD'
+
+	AC_TRY_RUN([#include <stdio.h>
+		int main(int argc, char *argv[])
+		{
+			${cf_cv_main_return:-return}(argc < 0 || argv == 0 || argv[0] == 0);
+		}
+	],
+		cf_ok_build_cc=yes,
+		cf_ok_build_cc=no,
+		cf_ok_build_cc=unknown)
+
+	cross_compiling=$cf_save_crossed
+	ac_link=$cf_save_ac_link
+
+	AC_MSG_RESULT($cf_ok_build_cc)
+
+	if test "$cf_ok_build_cc" != yes
+	then
 		AC_MSG_ERROR([Cross-build requires two compilers.
 Use --with-build-cc to specify the native compiler.])
 	fi
@@ -777,6 +800,37 @@ case "$cf_cv_gnat_version" in
 	;;
 esac
 ])
+dnl ---------------------------------------------------------------------------
+dnl CF_CHECK_LIBSSP version: 1 updated: 2021/10/30 10:40:19
+dnl ---------------
+dnl Check if libssp is needed, e.g., to work around misconfigured libraries
+dnl used in cross-compiling to MinGW.
+AC_DEFUN([CF_CHECK_LIBSSP],[
+AC_CACHE_CHECK(if ssp library is needed,cf_cv_need_libssp,[
+AC_TRY_LINK([
+#include <sys/types.h>
+#include <dirent.h>
+],[
+       DIR *dp = opendir(".");
+],cf_cv_need_libssp=no,[
+	cf_save_LIBS="$LIBS"
+	LIBS="$LIBS -lssp"
+	AC_TRY_LINK([
+#include <sys/types.h>
+#include <dirent.h>
+	],[
+		   DIR *dp = opendir(".");
+	],cf_cv_need_libssp=yes,
+	  cf_cv_need_libssp=maybe)
+	LIBS="$cf_save_LIBS"
+])dnl
+])
+
+if test "x$cf_cv_need_libssp" = xyes
+then
+	CF_ADD_LIB(ssp)
+fi
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl CF_CLANG_COMPILER version: 8 updated: 2021/01/01 13:31:04
 dnl -----------------
@@ -1298,7 +1352,7 @@ AC_DEFUN([CF_FIXUP_ADAFLAGS],[
 	AC_MSG_RESULT($ADAFLAGS)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_FIX_WARNINGS version: 3 updated: 2020/12/31 18:40:20
+dnl CF_FIX_WARNINGS version: 4 updated: 2021/12/16 18:22:31
 dnl ---------------
 dnl Warning flags do not belong in CFLAGS, CPPFLAGS, etc.  Any of gcc's
 dnl "-Werror" flags can interfere with configure-checks.  Those go into
@@ -1310,11 +1364,13 @@ if test "$GCC" = yes || test "$GXX" = yes
 then
 	case [$]$1 in
 	(*-Werror=*)
-		CF_VERBOSE(repairing $1: [$]$1)
 		cf_temp_flags=
 		for cf_temp_scan in [$]$1
 		do
 			case "x$cf_temp_scan" in
+			(x-Werror=format*)
+				CF_APPEND_TEXT(cf_temp_flags,$cf_temp_scan)
+				;;
 			(x-Werror=*)
 				CF_APPEND_TEXT(EXTRA_CFLAGS,$cf_temp_scan)
 				;;
@@ -1323,9 +1379,13 @@ then
 				;;
 			esac
 		done
-		$1="$cf_temp_flags"
-		CF_VERBOSE(... fixed [$]$1)
-		CF_VERBOSE(... extra $EXTRA_CFLAGS)
+		if test "x[$]$1" != "x$cf_temp_flags"
+		then
+			CF_VERBOSE(repairing $1: [$]$1)
+			$1="$cf_temp_flags"
+			CF_VERBOSE(... fixed [$]$1)
+			CF_VERBOSE(... extra $EXTRA_CFLAGS)
+		fi
 		;;
 	esac
 fi
@@ -4486,34 +4546,20 @@ top_builddir=ifelse($1,,`pwd`,$1)
 AC_SUBST(top_builddir)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_TRY_XOPEN_SOURCE version: 3 updated: 2021/08/28 15:20:37
+dnl CF_TRY_XOPEN_SOURCE version: 4 updated: 2022/09/10 15:16:16
 dnl -------------------
 dnl If _XOPEN_SOURCE is not defined in the compile environment, check if we
 dnl can define it successfully.
 AC_DEFUN([CF_TRY_XOPEN_SOURCE],[
 AC_CACHE_CHECK(if we should define _XOPEN_SOURCE,cf_cv_xopen_source,[
-	AC_TRY_COMPILE([
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-],[
-#ifndef _XOPEN_SOURCE
-make an error
-#endif],
+	AC_TRY_COMPILE(CF__XOPEN_SOURCE_HEAD,CF__XOPEN_SOURCE_BODY,
 	[cf_cv_xopen_source=no],
 	[cf_save="$CPPFLAGS"
 	 CF_APPEND_TEXT(CPPFLAGS,-D_XOPEN_SOURCE=$cf_XOPEN_SOURCE)
-	 AC_TRY_COMPILE([
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-],[
-#ifdef _XOPEN_SOURCE
-make an error
-#endif],
-	[cf_cv_xopen_source=no],
-	[cf_cv_xopen_source=$cf_XOPEN_SOURCE])
-	CPPFLAGS="$cf_save"
+	 AC_TRY_COMPILE(CF__XOPEN_SOURCE_HEAD,CF__XOPEN_SOURCE_BODY,
+		[cf_cv_xopen_source=no],
+		[cf_cv_xopen_source=$cf_XOPEN_SOURCE])
+		CPPFLAGS="$cf_save"
 	])
 ])
 
@@ -4771,7 +4817,7 @@ eval $3="$withval"
 AC_SUBST($3)dnl
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_WITH_PKG_CONFIG_LIBDIR version: 13 updated: 2021/10/17 11:12:47
+dnl CF_WITH_PKG_CONFIG_LIBDIR version: 20 updated: 2022/01/29 17:03:42
 dnl -------------------------
 dnl Allow the choice of the pkg-config library directory to be overridden.
 dnl
@@ -4794,98 +4840,113 @@ case "$PKG_CONFIG" in
 	;;
 esac
 
+# if $PKG_CONFIG_LIBDIR is set, try to use that
 cf_search_path=`echo "$PKG_CONFIG_LIBDIR" | sed -e 's/:/ /g' -e 's,^[[ 	]]*,,'`
+
+# if the option is used, let that override.  otherwise default to "libdir"
 AC_ARG_WITH(pkg-config-libdir,
 	[  --with-pkg-config-libdir=XXX use given directory for installing pc-files],
 	[cf_search_path=$withval],
-	[test "x$PKG_CONFIG" != xnone && cf_search_path=yes])
+	[test "x$PKG_CONFIG" != xnone && test -z "$cf_search_path" && cf_search_path=libdir])
 
-case x$cf_search_path in
-(x/*)
-	;;
-(xyes)
+case "x$cf_search_path" in
+(xlibdir)
+	PKG_CONFIG_LIBDIR='${libdir}/pkgconfig'
+	AC_MSG_RESULT($PKG_CONFIG_LIBDIR)
 	cf_search_path=
-	CF_VERBOSE(auto...)
+	;;
+(x)
+	;;
+(x/*\ *)
+	PKG_CONFIG_LIBDIR=
+	;;
+(x/*)
+	PKG_CONFIG_LIBDIR="$cf_search_path"
+	AC_MSG_RESULT($PKG_CONFIG_LIBDIR)
+	cf_search_path=
+	;;
+(xyes|xauto)
+	AC_MSG_RESULT(auto)
+	cf_search_path=
 	# Look for the library directory using the same prefix as the executable
 	AC_MSG_CHECKING(for search-list)
-	if test "x$PKG_CONFIG" = xnone
+	if test "x$PKG_CONFIG" != xnone
 	then
-		cf_path=$prefix
-	else
-		cf_path=`echo "$PKG_CONFIG" | sed -e 's,/[[^/]]*/[[^/]]*$,,'`
+		# works for pkg-config since version 0.24 (2009)
+		# works for pkgconf since version 0.8.3 (2012)
+		for cf_pkg_program in \
+			`echo "$PKG_CONFIG" | sed -e 's,^.*/,,'` \
+			pkg-config \
+			pkgconf
+		do
+			cf_search_path=`"$PKG_CONFIG" --variable=pc_path "$cf_pkg_program" 2>/dev/null | tr : ' '`
+			test -n "$cf_search_path" && break
+		done
+
+		# works for pkg-config since import in 2005 of original 2001 HP code.
+		test -z "$cf_search_path" && \
 		cf_search_path=`
-		"$PKG_CONFIG" --debug --exists no-such-package 2>&1 | awk "\
-/^Scanning directory #[1-9][0-9]* '.*'$/{ \
+		"$PKG_CONFIG" --debug --exists no-such-package 2>&1 | $AWK "\
+/^Scanning directory (#[1-9][0-9]* )?'.*'$/{ \
 	sub(\"^[[^']]*'\",\"\"); \
 	sub(\"'.*\",\"\"); \
 	printf \" %s\", \\[$]0; } \
-/trying path:/{
-	sub(\"^.* trying path: \",\"\");
-	sub(\" for no-such-package.*$\",\"\");
-	printf \" %s\", \\[$]0;
-}
 { next; } \
 "`
 	fi
 
-	if test -z "$cf_search_path"
-	then
-		# If you don't like using the default architecture, you have to specify
-		# the intended library directory and corresponding compiler/linker
-		# options.
-		#
-		# This case allows for Debian's 2014-flavor of multiarch, along with
-		# the most common variations before that point.  Some other variants
-		# spell the directory differently, e.g., "pkg-config", and put it in
-		# unusual places.
-		#
-		# pkg-config has always been poorly standardized, which is ironic...
-		case x`(arch) 2>/dev/null` in
-		(*64)
-			cf_test_path="\
-				$cf_path/lib/*64-linux-gnu \
-				$cf_path/share \
-				$cf_path/lib64 \
-				$cf_path/lib32 \
-				$cf_path/lib"
-			;;
-		(*)
-			cf_test_path="\
-				$cf_path/lib/*-linux-gnu \
-				$cf_path/share \
-				$cf_path/lib32 \
-				$cf_path/lib \
-				$cf_path/libdata"
-			;;
-		esac
-		for cf_config in $cf_test_path
-		do
-			test -d "$cf_config/pkgconfig" && cf_search_path="$cf_search_path $cf_config/pkgconfig"
-		done
-	fi
-
 	AC_MSG_RESULT($cf_search_path)
-
 	;;
 (*)
+	AC_MSG_ERROR(Unexpected option value: $cf_search_path)
 	;;
 esac
 
-AC_MSG_CHECKING(for first directory)
-cf_pkg_config_path=none
-for cf_config in $cf_search_path
-do
-	if test -d "$cf_config"
-	then
-		cf_pkg_config_path=$cf_config
-		break
-	fi
-done
-AC_MSG_RESULT($cf_pkg_config_path)
+if test -n "$cf_search_path"
+then
+	AC_MSG_CHECKING(for first directory)
+	cf_pkg_config_path=none
+	for cf_config in $cf_search_path
+	do
+		if test -d "$cf_config"
+		then
+			cf_pkg_config_path=$cf_config
+			break
+		fi
+	done
+	AC_MSG_RESULT($cf_pkg_config_path)
 
-if test "x$cf_pkg_config_path" != xnone ; then
-	# limit this to the first directory found
-	PKG_CONFIG_LIBDIR="$cf_pkg_config_path"
+	if test "x$cf_pkg_config_path" != xnone ; then
+		# limit this to the first directory found
+		PKG_CONFIG_LIBDIR="$cf_pkg_config_path"
+	fi
+
+	if test -z "$PKG_CONFIG_LIBDIR" && test -n "$cf_search_path"
+	then
+		AC_MSG_CHECKING(for workaround)
+		if test "$prefix" = "NONE" ; then
+			cf_prefix="$ac_default_prefix"
+		else
+			cf_prefix="$prefix"
+		fi
+		eval cf_libdir=$libdir
+		cf_libdir=`echo "$cf_libdir" | sed -e "s,^NONE,$cf_prefix,"`
+		cf_backup=
+		for cf_config in $cf_search_path
+		do
+			case $cf_config in
+			$cf_libdir/pkgconfig)
+				PKG_CONFIG_LIBDIR=$cf_libdir/pkgconfig
+				break
+				;;
+			*)
+				test -z "$cf_backup" && cf_backup=$cf_config
+				;;
+			esac
+		done
+		test -z "$PKG_CONFIG_LIBDIR" && PKG_CONFIG_LIBDIR=$cf_backup
+		AC_MSG_RESULT($PKG_CONFIG_LIBDIR)
+	fi
 fi
 
 AC_SUBST(PKG_CONFIG_LIBDIR)
@@ -4953,7 +5014,7 @@ AC_ARG_WITH(system-type,
 ])
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_XOPEN_SOURCE version: 59 updated: 2021/08/28 15:20:37
+dnl CF_XOPEN_SOURCE version: 62 updated: 2022/10/02 19:55:56
 dnl ---------------
 dnl Try to get _XOPEN_SOURCE defined properly that we can use POSIX functions,
 dnl or adapt to the vendor's definitions to get equivalent functionality,
@@ -5004,7 +5065,7 @@ case "$host_os" in
 	cf_xopen_source="-D_SGI_SOURCE"
 	cf_XOPEN_SOURCE=
 	;;
-(linux*|uclinux*|gnu*|mint*|k*bsd*-gnu|cygwin)
+(linux*gnu|linux*gnuabi64|linux*gnuabin32|linux*gnueabi|linux*gnueabihf|linux*gnux32|uclinux*|gnu*|mint*|k*bsd*-gnu|cygwin)
 	CF_GNU_SOURCE($cf_XOPEN_SOURCE)
 	;;
 (minix*)
@@ -5053,7 +5114,13 @@ case "$host_os" in
 	;;
 (*)
 	CF_TRY_XOPEN_SOURCE
+	cf_save_xopen_cppflags="$CPPFLAGS"
 	CF_POSIX_C_SOURCE($cf_POSIX_C_SOURCE)
+	# Some of these niche implementations use copy/paste, double-check...
+	CF_VERBOSE(checking if _POSIX_C_SOURCE inteferes)
+	AC_TRY_COMPILE(CF__XOPEN_SOURCE_HEAD,CF__XOPEN_SOURCE_BODY,,[
+		AC_MSG_WARN(_POSIX_C_SOURCE definition is not usable)
+		CPPFLAGS="$cf_save_xopen_cppflags"])
 	;;
 esac
 
@@ -5097,3 +5164,23 @@ dnl ------------------
 dnl Trim something using sed, then trim extra whitespace
 dnl $1 = extra parameters, e.g., in CF_STRIP_G_OPT
 define([CF__SED_TRIMBLANKS],[sed ifelse($1,,,[$1] )-e 's%[[	]]% %g' -e 's% [[ ]]*% %g' -e 's%^ %%' -e 's% [$]%%'])dnl
+dnl ---------------------------------------------------------------------------
+dnl CF__XOPEN_SOURCE_BODY version: 1 updated: 2022/09/10 15:17:35
+dnl ---------------------
+dnl body of test when test-compiling for _XOPEN_SOURCE check
+define([CF__XOPEN_SOURCE_BODY],
+[
+#ifndef _XOPEN_SOURCE
+make an error
+#endif
+])
+dnl ---------------------------------------------------------------------------
+dnl CF__XOPEN_SOURCE_HEAD version: 1 updated: 2022/09/10 15:17:03
+dnl ---------------------
+dnl headers to include when test-compiling for _XOPEN_SOURCE check
+define([CF__XOPEN_SOURCE_HEAD],
+[
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+])

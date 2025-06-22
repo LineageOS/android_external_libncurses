@@ -1,5 +1,5 @@
 dnl***************************************************************************
-dnl Copyright 2018-2020,2021 Thomas E. Dickey                                *
+dnl Copyright 2018-2021,2022 Thomas E. Dickey                                *
 dnl Copyright 1998-2017,2018 Free Software Foundation, Inc.                  *
 dnl                                                                          *
 dnl Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -29,7 +29,7 @@ dnl***************************************************************************
 dnl
 dnl Author: Thomas E. Dickey 1996-on
 dnl
-dnl $Id: configure.in,v 1.163 2021/07/03 20:21:07 tom Exp $
+dnl $Id: configure.in,v 1.168 2022/11/05 22:13:12 tom Exp $
 dnl This is a simple configuration-script for the ncurses test programs that
 dnl allows the test-directory to be separately configured against a reference
 dnl system (i.e., sysvr4 curses)
@@ -255,6 +255,7 @@ unistd.h \
 CF_GETOPT_HEADER
 
 AC_CHECK_FUNCS( \
+cfmakeraw \
 getopt \
 gettimeofday \
 snprintf \
@@ -323,6 +324,7 @@ chgat \
 color_content \
 color_set \
 copywin \
+curses_trace \
 delscreen \
 dupwin \
 exit_curses \
@@ -359,6 +361,7 @@ tigetnum \
 tigetstr \
 tputs_sp \
 typeahead \
+unget_wch \
 use_default_colors \
 use_env \
 use_extended_names \

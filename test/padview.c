@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2019-2020,2021 Thomas E. Dickey                                *
+ * Copyright 2019-2021,2022 Thomas E. Dickey                                *
  * Copyright 2017 Free Software Foundation, Inc.                            *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -29,7 +29,7 @@
 /*
  * clone of view.c, using pads
  *
- * $Id: padview.c,v 1.18 2021/06/12 23:16:31 tom Exp $
+ * $Id: padview.c,v 1.22 2022/12/04 00:40:11 tom Exp $
  */
 
 #include <test.priv.h>
@@ -45,6 +45,7 @@ static GCC_NORETURN void finish(int sig);
 
 #define my_pair 1
 
+static WINDOW *global_pad;
 static int shift = 0;
 static bool try_color = FALSE;
 
@@ -54,8 +55,6 @@ static int num_lines;
 #if USE_WIDEC_SUPPORT
 static bool n_option = FALSE;
 #endif
-
-static GCC_NORETURN void usage(void);
 
 static void
 failed(const char *msg)
@@ -69,6 +68,8 @@ static void
 finish(int sig)
 {
     endwin();
+    if (global_pad != NULL)
+	delwin(global_pad);
     ExitProgram(sig != 0 ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
@@ -247,12 +248,13 @@ read_file(const char *filename)
 }
 
 static void
-usage(void)
+usage(int ok)
 {
     static const char *msg[] =
     {
 	"Usage: view [options] file"
 	,""
+	,USAGE_COMMON
 	,"Options:"
 	," -c       use color if terminal supports it"
 	," -i       ignore INT, QUIT, TERM signals"
@@ -268,8 +270,11 @@ usage(void)
     size_t n;
     for (n = 0; n < SIZEOF(msg); n++)
 	fprintf(stderr, "%s\n", msg[n]);
-    ExitProgram(EXIT_FAILURE);
+    ExitProgram(ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }
+/* *INDENT-OFF* */
+VERSION_COMMON()
+/* *INDENT-ON* */
 
 int
 main(int argc, char *argv[])
@@ -299,6 +304,7 @@ main(int argc, char *argv[])
 	0
     };
 
+    int ch;
     int i;
     int my_delay = 0;
     WINDOW *my_pad;
@@ -312,8 +318,8 @@ main(int argc, char *argv[])
 
     setlocale(LC_ALL, "");
 
-    while ((i = getopt(argc, argv, "cinstT:")) != -1) {
-	switch (i) {
+    while ((ch = getopt(argc, argv, OPTS_COMMON "cinstT:")) != -1) {
+	switch (ch) {
 	case 'c':
 	    try_color = TRUE;
 	    break;
@@ -334,7 +340,7 @@ main(int argc, char *argv[])
 		char *next = 0;
 		int tvalue = (int) strtol(optarg, &next, 0);
 		if (tvalue < 0 || (next != 0 && *next != 0))
-		    usage();
+		    usage(FALSE);
 		curses_trace((unsigned) tvalue);
 	    }
 	    break;
@@ -342,12 +348,16 @@ main(int argc, char *argv[])
 	    curses_trace(TRACE_CALLS);
 	    break;
 #endif
+	case OPTS_VERSION:
+	    show_version(argv);
+	    ExitProgram(EXIT_SUCCESS);
 	default:
-	    usage();
+	    usage(ch == OPTS_USAGE);
+	    /* NOTREACHED */
 	}
     }
     if (optind + 1 != argc)
-	usage();
+	usage(FALSE);
 
     InitAndCatch(initscr(), ignore_sigs ? SIG_IGN : finish);
     keypad(stdscr, TRUE);	/* enable keyboard mapping */
@@ -372,7 +382,8 @@ main(int argc, char *argv[])
      * Do this after starting color, otherwise the pad's background will be
      * uncolored after the ncurses 6.1.20181208 fixes.
      */
-    my_pad = read_file(fname = argv[optind]);
+    global_pad =
+	my_pad = read_file(fname = argv[optind]);
 
     my_row = 0;
     while (!done) {

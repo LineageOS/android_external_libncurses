@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2020,2021 Thomas E. Dickey                                     *
+ * Copyright 2020-2021,2022 Thomas E. Dickey                                *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -26,9 +26,9 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: dup_field.c,v 1.2 2021/03/27 23:41:57 tom Exp $
+ * $Id: dup_field.c,v 1.7 2022/12/10 23:31:31 tom Exp $
  *
- * Demonstrate move_field().
+ * Demonstrate dup_field().
  */
 
 #include <test.priv.h>
@@ -38,7 +38,8 @@
 #include <edit_field.h>
 #include <popup_msg.h>
 
-#define MY_DEMO		EDIT_FIELD('f')
+#define DO_DEMO	CTRL('F')	/* actual key for toggling demo-mode */
+#define MY_DEMO	EDIT_FIELD('f')	/* internal request-code */
 
 static char empty[] = "";
 static FIELD *all_fields[100];
@@ -51,7 +52,6 @@ static struct {
     { CTRL('A'),     REQ_BEG_FIELD,   "go to beginning of field" },
     { CTRL('D'),     REQ_DOWN_FIELD,  "move downward to field" },
     { CTRL('E'),     REQ_END_FIELD,   "go to end of field" },
-    { CTRL('G'),     MY_DEMO,         "move current field with cursor keys" },
     { CTRL('H'),     REQ_DEL_PREV,    "delete previous character" },
     { CTRL('I'),     REQ_NEXT_FIELD,  "go to next field" },
     { CTRL('K'),     REQ_CLR_EOF,     "clear to end of field" },
@@ -72,7 +72,8 @@ static struct {
     { KEY_NEXT,      REQ_NEXT_FIELD,  "go to next field" },
     { KEY_PREVIOUS,  REQ_PREV_FIELD,  "go to previous field" },
     { KEY_RIGHT,     REQ_RIGHT_CHAR,  "move right 1 character" },
-    { KEY_UP,        REQ_UP_CHAR,     "move up 1 character" }
+    { KEY_UP,        REQ_UP_CHAR,     "move up 1 character" },
+    { DO_DEMO,       MY_DEMO,         "duplicate current field" }
 };
 /* *INDENT-ON* */
 
@@ -106,11 +107,6 @@ my_help_edit_field(void)
 	free(msgs[n]);
     }
     free(msgs);
-}
-
-static void
-do_demo(FORM *form)
-{
 }
 
 static FIELD *
@@ -147,28 +143,6 @@ erase_form(FORM *f)
     werase(w);
     wrefresh(w);
     delwin(s);
-    delwin(w);
-}
-
-static int
-my_form_driver(FORM *form, int c)
-{
-    switch (c) {
-    case MY_QUIT:
-	if (form_driver(form, REQ_VALIDATION) == E_OK)
-	    return (TRUE);
-	break;
-    case MY_HELP:
-	my_help_edit_field();
-	break;
-    case MY_DEMO:
-	do_demo(form);
-	break;
-    default:
-	beep();
-	break;
-    }
-    return (FALSE);
 }
 
 static FieldAttrs *
@@ -291,6 +265,55 @@ my_edit_field(FORM *form, int *result)
     return status;
 }
 
+static FIELD **
+copy_fields(FIELD **source, FIELD *extra, size_t length)
+{
+    FIELD **target = typeCalloc(FIELD *, length + 1);
+    memcpy(target, source, length * sizeof(FIELD *));
+    target[length] = extra;
+    return target;
+}
+
+static void
+do_demo(FORM *form)
+{
+    int count = field_count(form);
+    FIELD *my_field = current_field(form);
+    FIELD **old_fields = form_fields(form);
+
+    if (count > 0 && old_fields != NULL && my_field != NULL) {
+	FIELD **new_fields = copy_fields(old_fields,
+					 dup_field(my_field,
+						   form_field_row(my_field)
+						   + 1,
+						   form_field_col(my_field)),
+					 (size_t) count);
+	if (new_fields != NULL)
+	    set_form_fields(form, new_fields);
+    }
+}
+
+static int
+my_form_driver(FORM *form, int c)
+{
+    switch (c) {
+    case MY_QUIT:
+	if (form_driver(form, REQ_VALIDATION) == E_OK)
+	    return (TRUE);
+	break;
+    case MY_HELP:
+	my_help_edit_field();
+	break;
+    case MY_DEMO:
+	do_demo(form);
+	break;
+    default:
+	beep();
+	break;
+    }
+    return (FALSE);
+}
+
 static void
 demo_forms(void)
 {
@@ -354,9 +377,44 @@ demo_forms(void)
     nl();
 }
 
-int
-main(void)
+static void
+usage(int ok)
 {
+    static const char *msg[] =
+    {
+	"Usage: dup_field [options]"
+	,""
+	,USAGE_COMMON
+    };
+    size_t n;
+
+    for (n = 0; n < SIZEOF(msg); n++)
+	fprintf(stderr, "%s\n", msg[n]);
+
+    ExitProgram(ok ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+/* *INDENT-OFF* */
+VERSION_COMMON()
+/* *INDENT-ON* */
+
+int
+main(int argc, char *argv[])
+{
+    int ch;
+
+    while ((ch = getopt(argc, argv, OPTS_COMMON)) != -1) {
+	switch (ch) {
+	case OPTS_VERSION:
+	    show_version(argv);
+	    ExitProgram(EXIT_SUCCESS);
+	default:
+	    usage(ch == OPTS_USAGE);
+	    /* NOTREACHED */
+	}
+    }
+    if (optind < argc)
+	usage(FALSE);
+
     setlocale(LC_ALL, "");
 
     initscr();

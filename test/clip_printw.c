@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright 2019,2020 Thomas E. Dickey                                     *
+ * Copyright 2019-2020,2022 Thomas E. Dickey                                *
  * Copyright 2008-2016,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -27,7 +27,7 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: clip_printw.c,v 1.19 2020/05/10 00:40:23 tom Exp $
+ * $Id: clip_printw.c,v 1.21 2022/12/10 23:31:31 tom Exp $
  *
  * demonstrate how to use printw without wrapping.
  */
@@ -358,9 +358,45 @@ test_clipping(WINDOW *win)
     } while ((st.ch = wgetch(win)) != ERR);
 }
 
-int
-main(int argc GCC_UNUSED, char *argv[]GCC_UNUSED)
+static void
+usage(int ok)
 {
+    static const char *msg[] =
+    {
+	"Usage: clip_printw [options]"
+	,""
+	,USAGE_COMMON
+    };
+    size_t n;
+
+    for (n = 0; n < SIZEOF(msg); n++)
+	fprintf(stderr, "%s\n", msg[n]);
+
+    ExitProgram(ok ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+/* *INDENT-OFF* */
+VERSION_COMMON()
+/* *INDENT-ON* */
+
+int
+main(int argc, char *argv[])
+{
+    int ch;
+
+    while ((ch = getopt(argc, argv, OPTS_COMMON)) != -1) {
+	switch (ch) {
+	case OPTS_VERSION:
+	    show_version(argv);
+	    ExitProgram(EXIT_SUCCESS);
+	default:
+	    usage(ch == OPTS_USAGE);
+	    /* NOTREACHED */
+	}
+    }
+    if (optind < argc)
+	usage(FALSE);
+
+    setlocale(LC_ALL, "");
     initscr();
     cbreak();
     noecho();
