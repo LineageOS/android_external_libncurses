@@ -3341,7 +3341,6 @@ _nc_get_table(bool termcap)
     return termcap ? build_names(cap) : build_names(info);
 }
 
-/* entrypoint used by tack 1.07 */
 NCURSES_EXPORT(const HashValue *)
 _nc_get_hash_table(bool termcap)
 {

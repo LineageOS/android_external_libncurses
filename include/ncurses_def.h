@@ -81,6 +81,10 @@
 #define HAVE_CHGAT 1
 #endif
 
+#ifndef HAVE_CLOCK_GETTIME
+#define HAVE_CLOCK_GETTIME 0
+#endif
+
 #ifndef HAVE_COLOR_CONTENT
 #define HAVE_COLOR_CONTENT 1
 #endif
@@ -91,6 +95,10 @@
 
 #ifndef HAVE_CONSISTENT_GETENV
 #define HAVE_CONSISTENT_GETENV 0
+#endif
+
+#ifndef HAVE_CONSISTENT_MB_LEN_MAX
+#define HAVE_CONSISTENT_MB_LEN_MAX 0
 #endif
 
 #ifndef HAVE_COPYWIN
@@ -107,6 +115,10 @@
 
 #ifndef HAVE_CURSES_DATA_TTYTYPE
 #define HAVE_CURSES_DATA_TTYTYPE 1
+#endif
+
+#ifndef HAVE_CURSES_TRACE
+#define HAVE_CURSES_TRACE 1
 #endif
 
 #ifndef HAVE_DELSCREEN
@@ -129,6 +141,14 @@
 #define HAVE_ERRNO 0
 #endif
 
+#ifndef HAVE_EXIT_CURSES
+#define HAVE_EXIT_CURSES 1
+#endif
+
+#ifndef HAVE_EXIT_TERMINFO
+#define HAVE_EXIT_TERMINFO 1
+#endif
+
 #ifndef HAVE_FCNTL_H
 #define HAVE_FCNTL_H 0
 #endif
@@ -139,6 +159,14 @@
 
 #ifndef HAVE_FORM_H
 #define HAVE_FORM_H 0
+#endif
+
+#ifndef HAVE_FPATHCONF
+#define HAVE_FPATHCONF 0
+#endif
+
+#ifndef HAVE_GETAUXVAL
+#define HAVE_GETAUXVAL 0
 #endif
 
 #ifndef HAVE_GETBEGX
@@ -183,6 +211,10 @@
 
 #ifndef HAVE_GETTTYNAM
 #define HAVE_GETTTYNAM 0
+#endif
+
+#ifndef HAVE_GETUID
+#define HAVE_GETUID 0
 #endif
 
 #ifndef HAVE_GETWIN
@@ -289,6 +321,10 @@
 #define HAVE_LONG_FILE_NAMES 0
 #endif
 
+#ifndef HAVE_MATH_FUNCS
+#define HAVE_MATH_FUNCS 0
+#endif
+
 #ifndef HAVE_MATH_H
 #define HAVE_MATH_H 0
 #endif
@@ -345,6 +381,10 @@
 #define HAVE_NANOSLEEP 0
 #endif
 
+#ifndef HAVE_NAPMS
+#define HAVE_NAPMS 1
+#endif
+
 #ifndef HAVE_NC_ALLOC_H
 #define HAVE_NC_ALLOC_H 0
 #endif
@@ -357,8 +397,12 @@
 #define HAVE_PANEL_H 0
 #endif
 
-#ifndef HAVE_PCRE2_POSIX_H
-#define HAVE_PCRE2_POSIX_H 0
+#ifndef HAVE_PATH_TTYS
+#define HAVE_PATH_TTYS 0
+#endif
+
+#ifndef HAVE_PCRE2POSIX_H
+#define HAVE_PCRE2POSIX_H 0
 #endif
 
 #ifndef HAVE_PCREPOSIX_H
@@ -445,6 +489,10 @@
 #define HAVE_SETENV 0
 #endif
 
+#ifndef HAVE_SETFSUID
+#define HAVE_SETFSUID 0
+#endif
+
 #ifndef HAVE_SETUPTERM
 #define HAVE_SETUPTERM 1
 #endif
@@ -511,6 +559,10 @@
 
 #ifndef HAVE_SYS_BSDTYPES_H
 #define HAVE_SYS_BSDTYPES_H 0
+#endif
+
+#ifndef HAVE_SYS_AUXV_H
+#define HAVE_SYS_AUXV_H 0
 #endif
 
 #ifndef HAVE_SYS_IOCTL_H
@@ -597,6 +649,18 @@
 #define HAVE_TIGETSTR 1
 #endif
 
+#ifndef HAVE_TIPARM
+#define HAVE_TIPARM 1
+#endif
+
+#ifndef HAVE_TIPARM_S
+#define HAVE_TIPARM_S 1
+#endif
+
+#ifndef HAVE_TISCAN_S
+#define HAVE_TISCAN_S 1
+#endif
+
 #ifndef HAVE_TIMES
 #define HAVE_TIMES 0
 #endif
@@ -607,10 +671,6 @@
 
 #ifndef HAVE_TSEARCH
 #define HAVE_TSEARCH 0
-#endif
-
-#ifndef HAVE_TTYENT_H
-#define HAVE_TTYENT_H 0
 #endif
 
 #ifndef HAVE_TYPEAHEAD
@@ -633,6 +693,10 @@
 #define HAVE_UNCTRL_H 1
 #endif
 
+#ifndef HAVE_UNGET_WCH
+#define HAVE_UNGET_WCH 1
+#endif
+
 #ifndef HAVE_UNISTD_H
 #define HAVE_UNISTD_H 0
 #endif
@@ -650,7 +714,7 @@
 #endif
 
 #ifndef HAVE_USE_EXTENDED_NAMES
-#define HAVE_USE_EXTENDED_NAMES 0
+#define HAVE_USE_EXTENDED_NAMES NCURSES_XNAMES
 #endif
 
 #ifndef HAVE_USE_SCREEN
@@ -717,6 +781,10 @@
 #define HAVE_WINSSTR 1
 #endif
 
+#ifndef HAVE_WMEMCHR
+#define HAVE_WMEMCHR 0
+#endif
+
 #ifndef HAVE_WORKING_POLL
 #define HAVE_WORKING_POLL 0
 #endif
@@ -735,6 +803,10 @@
 
 #ifndef HAVE__TRACEF
 #define HAVE__TRACEF 0
+#endif
+
+#ifndef HAVE__NC_TPARM_ANALYZE
+#define HAVE__NC_TPARM_ANALYZE 1
 #endif
 
 #ifndef MIXEDCASE_FILENAMES

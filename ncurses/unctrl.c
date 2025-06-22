@@ -116,7 +116,7 @@ static const char unctrl_blob[] =
 	int check = (int) ChCharOf(ch);
 	const char *result;
 
-(void) sp;
+	(void) sp;
 	if (check >= 0 && check < (int)SIZEOF(unctrl_table)) {
 #if NCURSES_EXT_FUNCS
 		if ((sp != 0)
@@ -127,6 +127,7 @@ static const char unctrl_blob[] =
 		else
 		if ((check >= 160)
 		 && (check < 256)
+		 && !_nc_unicode_locale()
 		 && ((sp != 0)
 		  && ((sp->_legacy_coding > 0)
 		   || (sp->_legacy_coding == 0

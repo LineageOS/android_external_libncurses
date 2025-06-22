@@ -1,6 +1,6 @@
 // * This makes emacs happy -*-Mode: C++;-*-
 /****************************************************************************
- * Copyright 2018,2020 Thomas E. Dickey                                     *
+ * Copyright 2018-2021,2022 Thomas E. Dickey                                *
  * Copyright 1998-2012,2017 Free Software Foundation, Inc.                  *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
@@ -32,7 +32,7 @@
  *   Author: Juergen Pfeifer, 1997                                          *
  ****************************************************************************/
 
-// $Id: etip.h.in,v 1.43 2020/02/02 23:34:34 tom Exp $
+// $Id: etip.h.in,v 1.50 2022/08/20 20:50:00 tom Exp $
 
 #ifndef NCURSES_ETIP_H_incl
 #define NCURSES_ETIP_H_incl 1
@@ -68,6 +68,10 @@
 
 #ifndef ETIP_NEEDS_MATH_EXCEPTION
 #define ETIP_NEEDS_MATH_EXCEPTION 0
+#endif
+
+#ifndef CPP_HAS_OVERRIDE
+#define CPP_HAS_OVERRIDE 0
 #endif
 
 #ifndef CPP_HAS_PARAM_INIT
@@ -127,6 +131,12 @@ extern "C" {
 }
 
 // Language features
+#if CPP_HAS_OVERRIDE
+#define NCURSES_OVERRIDE override
+#else
+#define NCURSES_OVERRIDE /*nothing*/
+#endif
+
 #if CPP_HAS_PARAM_INIT
 #define NCURSES_PARAM_INIT(value) = value
 #else
@@ -139,12 +149,16 @@ extern "C" {
 #define STATIC_CAST(s) (s)
 #endif
 
-// Forward Declarations
-class NCURSES_IMPEXP NCursesPanel;
-class NCURSES_IMPEXP NCursesMenu;
-class NCURSES_IMPEXP NCursesForm;
+#ifndef NCURSES_CXX_IMPEXP
+#define NCURSES_CXX_IMPEXP  /* nothing */
+#endif
 
-class NCURSES_IMPEXP NCursesException
+// Forward Declarations
+class NCURSES_CXX_IMPEXP NCursesPanel;
+class NCURSES_CXX_IMPEXP NCursesMenu;
+class NCURSES_CXX_IMPEXP NCursesForm;
+
+class NCURSES_CXX_IMPEXP NCursesException
 {
 public:
   const char *message;
@@ -154,12 +168,13 @@ public:
     : message(msg), errorno (err)
     {};
 
-  NCursesException (const char* msg)
+  explicit NCursesException (const char* msg)
     : message(msg), errorno (E_SYSTEM_ERROR)
     {};
 
   NCursesException& operator=(const NCursesException& rhs)
   {
+    message = rhs.message;
     errorno = rhs.errorno;
     return *this;
   }
@@ -178,7 +193,7 @@ public:
   }
 };
 
-class NCURSES_IMPEXP NCursesPanelException : public NCursesException
+class NCURSES_CXX_IMPEXP NCursesPanelException : public NCursesException
 {
 public:
   const NCursesPanel* p;
@@ -195,7 +210,7 @@ public:
     p (panel)
     {};
 
-  NCursesPanelException (int err) :
+  explicit NCursesPanelException (int err) :
     NCursesException ("panel library error", err),
     p (0)
     {};
@@ -220,7 +235,7 @@ public:
   {
   }
 
-  virtual const char *classname() const {
+  virtual const char *classname() const NCURSES_OVERRIDE {
     return "NCursesPanel";
   }
 
@@ -229,7 +244,7 @@ public:
   }
 };
 
-class NCURSES_IMPEXP NCursesMenuException : public NCursesException
+class NCURSES_CXX_IMPEXP NCursesMenuException : public NCursesException
 {
 public:
   const NCursesMenu* m;
@@ -246,7 +261,7 @@ public:
     m (menu)
     {};
 
-  NCursesMenuException (int err) :
+  explicit NCursesMenuException (int err) :
     NCursesException ("menu library error", err),
     m (0)
     {};
@@ -271,7 +286,7 @@ public:
   {
   }
 
-  virtual const char *classname() const {
+  virtual const char *classname() const NCURSES_OVERRIDE {
     return "NCursesMenu";
   }
 
@@ -280,7 +295,7 @@ public:
   }
 };
 
-class NCURSES_IMPEXP NCursesFormException : public NCursesException
+class NCURSES_CXX_IMPEXP NCursesFormException : public NCursesException
 {
 public:
   const NCursesForm* f;
@@ -297,7 +312,7 @@ public:
     f (form)
     {};
 
-  NCursesFormException (int err) :
+  explicit NCursesFormException (int err) :
     NCursesException ("form library error", err),
     f (0)
     {};
@@ -322,7 +337,7 @@ public:
   {
   }
 
-  virtual const char *classname() const {
+  virtual const char *classname() const NCURSES_OVERRIDE {
     return "NCursesForm";
   }
 
@@ -341,7 +356,6 @@ using std::endl;
 #  else
 #     include <iostream.h>
 #  endif
-   extern "C" void exit(int);
 #endif
 
 inline void THROW(const NCursesException *e) {
